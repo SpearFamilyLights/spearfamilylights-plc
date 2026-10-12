@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <Itf Name="I_JsonSource" Id="{3a9de686-11a5-4468-af33-eab0276fd80a}">
+    <Declaration><![CDATA[INTERFACE I_JsonSource
+]]></Declaration>
+    <Method Name="WriteJson" Id="{69ea238b-6fe5-4d4a-a243-eb63ce0c414a}">
+      <Declaration><![CDATA[// Writes the keys of one JSON object. The caller opens and closes the object.
+METHOD WriteJson
+VAR_INPUT
+    eSection : E_JsonSection;
+END_VAR
+VAR_IN_OUT
+    fbJson : FB_JsonSaxWriter;
+END_VAR]]></Declaration>
+    </Method>
+  </Itf>
+</TcPlcObject>

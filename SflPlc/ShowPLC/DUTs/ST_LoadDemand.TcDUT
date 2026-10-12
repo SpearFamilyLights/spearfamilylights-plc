@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <DUT Name="ST_LoadDemand" Id="{03142ffa-72f4-4174-a47d-918eec1972a9}">
+    <Declaration><![CDATA[TYPE ST_LoadDemand :
+STRUCT
+    eKind     : E_LoadKind;  // how the feed treats this load
+    fAcPowerW : LREAL;       // W on the AC side. Measured and Rated loads only
+    fWeight   : LREAL;       // share weight. Estimated loads only (the pixel count)
+    bValid    : BOOL;        // FALSE: a measured load that is not reporting
+END_STRUCT
+END_TYPE]]></Declaration>
+  </DUT>
+</TcPlcObject>

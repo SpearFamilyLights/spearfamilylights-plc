@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <DUT Name="ST_GenericLoadConfig" Id="{ca28d6d9-4e6e-44fe-aef6-050f6e4e55e4}">
+    <Declaration><![CDATA[TYPE ST_GenericLoadConfig :
+STRUCT
+    sId          : STRING(20);  // L1, L2, ...
+    sName        : STRING(40);
+    nFeedId      : INT := 1;    // index into GVL_Config.aFeeds
+    fRatedPowerW : LREAL;       // W on the AC side
+    bEnabled     : BOOL;        // FALSE: counts as 0 W
+END_STRUCT
+END_TYPE]]></Declaration>
+  </DUT>
+</TcPlcObject>

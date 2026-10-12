@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <GVL Name="GVL_Param" Id="{fa332ec0-3411-4607-9237-06f3b57d3a6b}">
+    <Declaration><![CDATA[{attribute 'qualified_only'}
+VAR_GLOBAL CONSTANT
+    FEED_COUNT         : INT := 2;
+    BOX_COUNT          : INT := 9;
+    LOAD_COUNT         : INT := 2;
+    MAX_LOADS_PER_FEED : INT := GVL_Param.BOX_COUNT + GVL_Param.LOAD_COUNT;
+    HARMONIC_MAX_ORDER : INT := 25;  // highest harmonic order kept and published. 2..63
+END_VAR]]></Declaration>
+  </GVL>
+</TcPlcObject>

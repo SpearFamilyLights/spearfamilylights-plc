@@ -1,0 +1,35 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="F_JsonHarmArray" Id="{42552454-555e-4e8c-acbe-6b1ed80c13ec}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION F_JsonHarmArray : BOOL
+VAR_INPUT
+    sKey   : STRING(31);
+    bValid : BOOL;
+END_VAR
+VAR_IN_OUT
+    fbJson  : FB_JsonSaxWriter;
+    aValues : ARRAY[2..GVL_Param.HARMONIC_MAX_ORDER] OF LREAL;
+END_VAR
+VAR
+    n  : INT;
+    fV : LREAL;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[fbJson.AddKey(sKey);
+fbJson.StartArray();
+IF bValid THEN
+    FOR n := 2 TO GVL_Param.HARMONIC_MAX_ORDER DO
+        fV := aValues[n];
+        IF IsFinite(F_LREAL(fV)) THEN
+            fV := LIMIT(0.0, fV, 1000.0);
+            fbJson.AddLreal(LINT_TO_LREAL(LREAL_TO_LINT(fV * 10.0)) / 10.0);
+        ELSE
+            fbJson.AddNull();
+        END_IF
+    END_FOR
+END_IF
+fbJson.EndArray();
+F_JsonHarmArray := bValid;]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

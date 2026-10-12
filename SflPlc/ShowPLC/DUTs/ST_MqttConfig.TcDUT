@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <DUT Name="ST_MqttConfig" Id="{40d0bcd4-3ea1-48be-bc04-c96b63365909}">
+    <Declaration><![CDATA[TYPE ST_MqttConfig :
+STRUCT
+    bEnable     : BOOL := TRUE;
+    sHost       : STRING(63) := '192.168.30.31';
+    nPort       : UINT := 1883;
+    sClientId   : STRING(63) := 'sfl-plc';
+    sUser       : STRING(63) := 'plc';
+    nKeepAliveS : UINT := 30;
+    sTopicRoot  : STRING(63) := 'sfl/plc';
+    tDashboard  : TIME := T#1S;
+    tDiag       : TIME := T#5S;
+    tHarmonics  : TIME := T#10S;
+END_STRUCT
+END_TYPE]]></Declaration>
+  </DUT>
+</TcPlcObject>

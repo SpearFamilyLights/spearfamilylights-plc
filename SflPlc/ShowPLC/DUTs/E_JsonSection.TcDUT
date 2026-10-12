@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <DUT Name="E_JsonSection" Id="{ef3a1803-c98b-455c-b284-ed2e30172d5a}">
+    <Declaration><![CDATA[{attribute 'qualified_only'}
+{attribute 'strict'}
+TYPE E_JsonSection :
+(
+    Circuit := 0,   // one row of the website's original circuits[] list
+    Feed,           // one row of feeds[]
+    Box,            // one row of boxes[]
+    Load,           // one row of loads[]
+    Diag,           // the body of the diag payload
+    Harmonics       // one row of the harmonics payload
+);
+END_TYPE]]></Declaration>
+  </DUT>
+</TcPlcObject>

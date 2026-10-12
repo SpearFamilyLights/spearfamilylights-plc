@@ -1,0 +1,48 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="F_JsonNum" Id="{0f219cb6-70de-4249-8eb8-cd45a106f968}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION F_JsonNum : BOOL
+VAR_INPUT
+    sKey      : STRING(31);
+    fValue    : LREAL;
+    bValid    : BOOL;
+    nDecimals : INT;  // 0..3
+END_VAR
+VAR_IN_OUT
+    fbJson : FB_JsonSaxWriter;
+END_VAR
+VAR
+    fTmp   : LREAL;
+    fScale : LREAL;
+    bOk    : BOOL;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[fTmp := fValue;
+bOk := FALSE;
+IF bValid THEN
+    IF IsFinite(F_LREAL(fTmp)) THEN
+        bOk := ABS(fTmp) < 1.0E12;
+    END_IF
+END_IF
+
+fbJson.AddKey(sKey);
+IF bOk THEN
+    CASE nDecimals OF
+        1: fScale := 10.0;
+        2: fScale := 100.0;
+        3: fScale := 1000.0;
+    ELSE
+        fScale := 1.0;
+    END_CASE
+    fTmp := LINT_TO_LREAL(LREAL_TO_LINT(fTmp * fScale)) / fScale;
+    IF fTmp < 0.0 THEN
+        fTmp := 0.0;
+    END_IF
+    fbJson.AddLreal(fTmp);
+ELSE
+    fbJson.AddNull();
+END_IF
+F_JsonNum := bOk;]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="F_CleanReal" Id="{cafe1857-0697-4d51-aabb-cb5e1ae2e48c}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION F_CleanReal : LREAL
+VAR_INPUT
+    fIn : REAL;
+END_VAR
+VAR_IN_OUT
+    bAllFinite : BOOL;  // set FALSE when fIn is NaN or infinite; never set TRUE here
+END_VAR
+VAR
+    fTmp : REAL;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[fTmp := fIn;
+IF IsFinite(F_REAL(fTmp)) THEN
+    F_CleanReal := fTmp;
+ELSE
+    F_CleanReal := 0.0;
+    bAllFinite := FALSE;
+END_IF]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

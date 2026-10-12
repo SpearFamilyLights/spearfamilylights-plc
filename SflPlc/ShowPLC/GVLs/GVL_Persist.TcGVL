@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <GVL Name="GVL_Persist" Id="{37ce5e80-ae4b-490d-b27a-ae2eb12b868e}">
+    <Declaration><![CDATA[{attribute 'qualified_only'}
+VAR_GLOBAL PERSISTENT
+    sMqttPassword : STRING(63);                                  // empty = telemetry stays offline
+    aEnergyWh     : ARRAY[1..GVL_Param.FEED_COUNT] OF LREAL;     // Wh per feed since local midnight
+    nEnergyDay    : UDINT;                                       // local day number the counters belong to
+END_VAR]]></Declaration>
+  </GVL>
+</TcPlcObject>

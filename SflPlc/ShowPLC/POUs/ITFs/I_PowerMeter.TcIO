@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <Itf Name="I_PowerMeter" Id="{c6989071-34b2-47e3-8dc5-5c85359a8e3c}">
+    <Declaration><![CDATA[INTERFACE I_PowerMeter
+]]></Declaration>
+    <Method Name="Read" Id="{42e1835d-5612-4fad-a167-570b3ddc9bda}">
+      <Declaration><![CDATA[// Fills stMeas. Returns TRUE when the values are valid.
+METHOD Read : BOOL
+VAR_IN_OUT
+    stMeas : ST_AcMeasurement;
+END_VAR]]></Declaration>
+    </Method>
+    <Method Name="ReadHarmonics" Id="{4816c62d-3b70-43c1-a548-f85e0b077443}">
+      <Declaration><![CDATA[// Fills stHarm. Returns TRUE when the values are valid.
+METHOD ReadHarmonics : BOOL
+VAR_IN_OUT
+    stHarm : ST_Harmonics;
+END_VAR]]></Declaration>
+    </Method>
+  </Itf>
+</TcPlcObject>

@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="F_LowPas" Id="{d7ad7d40-090b-4886-9c9e-8e9a173ca5ff}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION F_LowPass : LREAL
+VAR_INPUT
+    fState  : LREAL;  // filtered value from the previous cycle
+    fInput  : LREAL;  // new raw value
+    fTimeS  : LREAL;  // time constant in seconds. 0 switches the filter off
+    fCycleS : LREAL;  // task cycle time in seconds
+END_VAR
+VAR
+    fAlpha : LREAL;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[IF (fTimeS <= 0.0) OR (fCycleS <= 0.0) THEN
+    F_LowPass := fInput;
+ELSE
+    fAlpha := fCycleS / (fTimeS + fCycleS);
+    F_LowPass := fState + fAlpha * (fInput - fState);
+END_IF]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

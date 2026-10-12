@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="F_FeedIdString" Id="{fcb21c3a-e317-4aac-934e-ad5a53bde315}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION F_FeedIdString : STRING(20)
+VAR_INPUT
+    nFeedId : INT;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[IF (nFeedId >= 1) AND (nFeedId <= GVL_Param.FEED_COUNT) THEN
+    F_FeedIdString := GVL_Config.aFeeds[nFeedId].sId;
+ELSE
+    F_FeedIdString := '';
+END_IF]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

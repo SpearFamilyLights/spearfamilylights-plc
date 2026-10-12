@@ -1,0 +1,60 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <GVL Name="GVL_Config" Id="{259683ca-55d5-46d8-98aa-3bdfeb0ea2be}">
+    <Declaration><![CDATA[{attribute 'qualified_only'}
+VAR_GLOBAL
+    // ---- development switches -------------------------------------------------
+    bSimulateMeters   : BOOL := TRUE;   // TRUE: feeds read FB_PowerMeter_Sim. Set FALSE in step 4
+    bSimulateSupplies : BOOL := TRUE;   // TRUE: supplies use their fSim values. Set FALSE in step 5
+
+    // ---- model ----------------------------------------------------------------
+    fFilterTimeS      : LREAL := 1.0;   // low-pass on feed and supply values before the split, seconds
+    fVoltsPresentMin  : LREAL := 90.0;  // V per leg. Above this a feed counts as "on"
+
+    // ---- feeds ----------------------------------------------------------------
+    aFeeds : ARRAY[1..GVL_Param.FEED_COUNT] OF ST_FeedConfig := [
+        (sId := 'F1', sName := 'Feed 1', fMaxAmps := 32.0, fInfeedLengthFt := 100.0, fInfeedOhmPerKft := 1.0),
+        (sId := 'F2', sName := 'Feed 2', fMaxAmps := 32.0, fInfeedLengthFt := 100.0, fInfeedOhmPerKft := 1.0)];
+
+    // ---- satellite controller boxes ---------------------------------------------
+    // sControllerName must match the website's label exactly. sId is its slug.
+    aBoxes : ARRAY[1..GVL_Param.BOX_COUNT] OF ST_BoxConfig := [
+        (sId := 'porch',        sControllerName := 'Porch',        nFeedId := 1, bHasEcPowerSupply := TRUE,  nPixelCount := 16325, fMaxDcCurrent := 20.0),
+        (sId := 'metal-roof',   sControllerName := 'Metal Roof',   nFeedId := 1, bHasEcPowerSupply := TRUE,  nPixelCount := 12820, fMaxDcCurrent := 20.0),
+        (sId := 'center-gable', sControllerName := 'Center Gable', nFeedId := 1, bHasEcPowerSupply := FALSE, nPixelCount := 2841,  fMaxDcCurrent := 20.0),
+        (sId := 'courtyard',    sControllerName := 'Courtyard',    nFeedId := 1, bHasEcPowerSupply := FALSE, nPixelCount := 452,   fMaxDcCurrent := 20.0),
+        (sId := 'lawn-s-1',     sControllerName := 'Lawn S-1',     nFeedId := 2, bHasEcPowerSupply := FALSE, nPixelCount := 1500,  fMaxDcCurrent := 20.0),
+        (sId := 'lawn-s-2',     sControllerName := 'Lawn S-2',     nFeedId := 2, bHasEcPowerSupply := FALSE, nPixelCount := 2541,  fMaxDcCurrent := 20.0),
+        (sId := 'lawn-s-3',     sControllerName := 'Lawn S-3',     nFeedId := 2, bHasEcPowerSupply := TRUE,  nPixelCount := 6141,  fMaxDcCurrent := 20.0),
+        (sId := 'lawn-n-1',     sControllerName := 'Lawn N-1',     nFeedId := 2, bHasEcPowerSupply := FALSE, nPixelCount := 2450,  fMaxDcCurrent := 20.0),
+        (sId := 'lawn-n-2',     sControllerName := 'Lawn N-2',     nFeedId := 2, bHasEcPowerSupply := FALSE, nPixelCount := 4115,  fMaxDcCurrent := 20.0)];
+
+    // ---- generic loads ------------------------------------------------------------
+    aLoads : ARRAY[1..GVL_Param.LOAD_COUNT] OF ST_GenericLoadConfig := [
+        (sId := 'L1', sName := 'Spare 1', nFeedId := 1, fRatedPowerW := 0.0, bEnabled := FALSE),
+        (sId := 'L2', sName := 'Spare 2', nFeedId := 2, fRatedPowerW := 0.0, bEnabled := FALSE)];
+
+    // ---- EtherCAT power supplies (PS2001) -------------------------------------------
+    // Info data scaling is not documented. 0.0 keeps the value out of the payload until it is checked in step 5.
+    fPsuInfo1Scale : LREAL := 0.0;      // degrees C per count of "Info data 1" (temperature)
+    fPsuInfo2Scale : LREAL := 0.0;      // volts per count of "Info data 2" (RMS input voltage)
+
+    // ---- TF8330 -----------------------------------------------------------------------
+    nTf8330FundamentalIndex : INT := 0; // element of aHarm1 that holds the fundamental (reads 100). -1 if the arrays start at the 2nd harmonic. Check in step 4
+
+    // ---- MQTT ---------------------------------------------------------------------------
+    stMqtt : ST_MqttConfig;             // defaults are in the type
+
+    // ---- local time, for the midnight energy reset: US Central ---------------------------
+    // UTC = local time + bias (minutes). wDay is the occurrence in the month: 1 = first, 2 = second, 5 = last.
+    stTimeZone : ST_TimeZoneInformation := (
+        bias         := 360,
+        standardName := 'CST',
+        standardDate := (wYear := 0, wMonth := 11, wDayOfWeek := 0, wDay := 1, wHour := 2),
+        standardBias := 0,
+        daylightName := 'CDT',
+        daylightDate := (wYear := 0, wMonth := 3, wDayOfWeek := 0, wDay := 2, wHour := 2),
+        daylightBias := -60);
+END_VAR]]></Declaration>
+  </GVL>
+</TcPlcObject>

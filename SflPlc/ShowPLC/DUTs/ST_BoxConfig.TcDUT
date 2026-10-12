@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <DUT Name="ST_BoxConfig" Id="{6a2d88ce-d797-411d-902e-cc3ed1de09f3}">
+    <Declaration><![CDATA[TYPE ST_BoxConfig :
+STRUCT
+    sId               : STRING(20);     // slug of the name: lowercase letters, digits and '-'
+    sControllerName   : STRING(40);     // exactly the label the website uses for this controller
+    nFeedId           : INT := 1;       // index into GVL_Config.aFeeds
+    bHasEcPowerSupply : BOOL;           // TRUE: live values come from the EtherCAT supply in the box
+    nPixelCount       : UDINT;
+    fMaxDcCurrent     : LREAL := 20.0;  // A
+    fNominalDcVolts   : LREAL := 24.0;  // turns an estimated share into DC amps
+    fPsuEfficiency    : LREAL := 0.95;  // DC power out / AC power in
+END_STRUCT
+END_TYPE]]></Declaration>
+  </DUT>
+</TcPlcObject>

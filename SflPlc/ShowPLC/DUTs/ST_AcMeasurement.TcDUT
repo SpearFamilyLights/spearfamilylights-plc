@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <DUT Name="ST_AcMeasurement" Id="{9de709c3-9957-4153-a1bf-45365334dcfd}">
+    <Declaration><![CDATA[TYPE ST_AcMeasurement :
+STRUCT
+    bValid        : BOOL;   // the values below can be used
+    bThdValid     : BOOL;   // the four THD values can be used
+    fVoltsL1      : LREAL;  // V, L1 to ground
+    fVoltsL2      : LREAL;  // V, L2 to ground
+    fVoltsLL      : LREAL;  // V, L1 to L2
+    fAmpsL1       : LREAL;  // A
+    fAmpsL2       : LREAL;  // A
+    fAmpsResidual : LREAL;  // A, summation transformer on the IN channel
+    fPowerW       : LREAL;  // W,  P(L1) + P(L2)
+    fApparentVA   : LREAL;  // VA, S(L1) + S(L2)
+    fPowerFactor  : LREAL;  // 0..1
+    fFrequencyHz  : LREAL;
+    fThdVoltsL1   : LREAL;  // %
+    fThdVoltsL2   : LREAL;  // %
+    fThdAmpsL1    : LREAL;  // %
+    fThdAmpsL2    : LREAL;  // %
+END_STRUCT
+END_TYPE]]></Declaration>
+  </DUT>
+</TcPlcObject>

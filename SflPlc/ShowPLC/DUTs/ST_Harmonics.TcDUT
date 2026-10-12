@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <DUT Name="ST_Harmonics" Id="{9d0c9201-a891-4b9d-a9f9-7a5e91356486}">
+    <Declaration><![CDATA[TYPE ST_Harmonics :
+STRUCT
+    bValid   : BOOL;
+    aVoltsL1 : ARRAY[2..GVL_Param.HARMONIC_MAX_ORDER] OF LREAL;
+    aVoltsL2 : ARRAY[2..GVL_Param.HARMONIC_MAX_ORDER] OF LREAL;
+    aAmpsL1  : ARRAY[2..GVL_Param.HARMONIC_MAX_ORDER] OF LREAL;
+    aAmpsL2  : ARRAY[2..GVL_Param.HARMONIC_MAX_ORDER] OF LREAL;
+END_STRUCT
+END_TYPE]]></Declaration>
+  </DUT>
+</TcPlcObject>

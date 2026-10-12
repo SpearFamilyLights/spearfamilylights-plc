@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="F_JsonInt" Id="{696ba799-6306-4e45-9a59-ed9d08410e72}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION F_JsonInt : BOOL
+VAR_INPUT
+    sKey   : STRING(31);
+    nValue : DINT;
+END_VAR
+VAR_IN_OUT
+    fbJson : FB_JsonSaxWriter;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[fbJson.AddKey(sKey);
+fbJson.AddDint(nValue);
+F_JsonInt := TRUE;]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <DUT Name="E_LoadKind" Id="{7bbbc4f4-a68f-4dc1-9323-4c5c241106e1}">
+    <Declaration><![CDATA[{attribute 'qualified_only'}
+{attribute 'strict'}
+TYPE E_LoadKind :
+(
+    Measured := 0,  // has its own measurement (box with an EtherCAT power supply)
+    Rated,          // fixed rated power (generic load)
+    Estimated       // gets a share of whatever is left on the feed (box without a supply)
+);
+END_TYPE]]></Declaration>
+  </DUT>
+</TcPlcObject>

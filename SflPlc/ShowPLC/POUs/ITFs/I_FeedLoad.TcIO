@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <Itf Name="I_FeedLoad" Id="{e9d402e0-5199-49bf-ba1d-31d237251500}">
+    <Declaration><![CDATA[INTERFACE I_FeedLoad]]></Declaration>
+    <Method Name="GetDemand" Id="{16dfdcc3-996f-4f47-bec7-546a288b2b08}">
+      <Declaration><![CDATA[// What this load asks of its feed this cycle.
+METHOD GetDemand : ST_LoadDemand]]></Declaration>
+    </Method>
+    <Method Name="SetShare" Id="{8533aa00-e123-46de-9fa7-94a0bb096c69}">
+      <Declaration><![CDATA[// The feed's answer to an Estimated load: its share of the unmeasured power.
+METHOD SetShare
+VAR_INPUT
+    fShareW     : LREAL;  // W on the AC side
+    bShareValid : BOOL;   // FALSE: the feed has no valid measurement
+END_VAR]]></Declaration>
+    </Method>
+  </Itf>
+</TcPlcObject>

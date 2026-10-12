@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="F_CycleTimeS" Id="{bbece659-fc2d-4015-9f4a-7e754ba5c4a8}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION F_CycleTimeS : LREAL
+VAR
+    nIdx : DINT;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[F_CycleTimeS := 0.010;  // fallback: 10 ms
+nIdx := GETCURTASKINDEXEX();
+IF (nIdx >= 1) AND (nIdx <= 20) THEN
+    IF _TaskInfo[nIdx].CycleTime > 0 THEN
+        F_CycleTimeS := UDINT_TO_LREAL(_TaskInfo[nIdx].CycleTime) * 1.0E-7;  // CycleTime is in 100 ns
+    END_IF
+END_IF]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

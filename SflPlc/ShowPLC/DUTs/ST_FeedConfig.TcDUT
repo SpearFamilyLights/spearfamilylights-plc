@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <DUT Name="ST_FeedConfig" Id="{18adeafb-2171-4642-893d-1330bbb7dac6}">
+    <Declaration><![CDATA[TYPE ST_FeedConfig :
+STRUCT
+    sId              : STRING(20);     // short id used in the payloads: F1, F2
+    sName            : STRING(40);
+    fMaxAmps         : LREAL := 32.0;  // A per leg
+    fInfeedLengthFt  : LREAL := 0.0;   // one-way length of the cable between the meter and the loads
+    fInfeedOhmPerKft : LREAL := 1.0;   // ohms per 1000 ft of ONE conductor. 10 AWG copper = 1.0
+END_STRUCT
+END_TYPE]]></Declaration>
+  </DUT>
+</TcPlcObject>
