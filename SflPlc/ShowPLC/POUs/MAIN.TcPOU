@@ -1,13 +1,60 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1">
-  <POU Name="MAIN" Id="{2d7c728b-ede9-47ae-8dbd-354027c84dfb}">
+  <POU Name="MAIN" Id="{2d7c728b-ede9-47ae-8dbd-354027c84dfb}" SpecialFunc="None">
     <Declaration><![CDATA[PROGRAM MAIN
 VAR
-END_VAR
-]]>
-    </Declaration>
+    // Power model
+    aFeeds     : ARRAY[1..GVL_Param.FEED_COUNT] OF FB_PowerFeed;
+    aSimMeters : ARRAY[1..GVL_Param.FEED_COUNT] OF FB_PowerMeter_Sim;
+    aBoxes     : ARRAY[1..GVL_Param.BOX_COUNT] OF FB_SatelliteController;
+    aLoads     : ARRAY[1..GVL_Param.LOAD_COUNT] OF FB_GenericLoad;
+    ipMeter    : I_PowerMeter;
+
+    // Totals for the website's top-level keys
+    fTotalPowerW   : LREAL;
+    fTotalAmps     : LREAL;
+    fEnergyTodayWh : LREAL;
+
+    i : INT;
+    n : INT;
+END_VAR]]></Declaration>
     <Implementation>
-      <ST><![CDATA[]]></ST>
+      <ST><![CDATA[// Feeds: read the meter, filter, cable loss, start a new load list
+FOR i := 1 TO GVL_Param.FEED_COUNT DO
+    ipMeter := aSimMeters[i];
+    aFeeds[i](stCfg := GVL_Config.aFeeds[i], ipMeter := ipMeter, fEnergyWh := GVL_Persist.aEnergyWh[i]);
+END_FOR
+
+// Boxes and generic loads: update, then report to their feed
+FOR i := 1 TO GVL_Param.BOX_COUNT DO
+    aBoxes[i](stCfg := GVL_Config.aBoxes[i]);
+    n := GVL_Config.aBoxes[i].nFeedId;
+    IF (n >= 1) AND (n <= GVL_Param.FEED_COUNT) THEN
+        aFeeds[n].AddLoad(ipLoad := aBoxes[i]);
+    ELSE
+        aBoxes[i].SetShare(fShareW := 0.0, bShareValid := FALSE);  // nFeedId names no feed: nothing to estimate from
+    END_IF
+END_FOR
+FOR i := 1 TO GVL_Param.LOAD_COUNT DO
+    aLoads[i](stCfg := GVL_Config.aLoads[i]);
+    n := GVL_Config.aLoads[i].nFeedId;
+    IF (n >= 1) AND (n <= GVL_Param.FEED_COUNT) THEN
+        aFeeds[n].AddLoad(ipLoad := aLoads[i]);
+    END_IF
+END_FOR
+
+// Feeds: split what is left between the boxes without a supply, and add up the totals
+fTotalPowerW   := 0.0;
+fTotalAmps     := 0.0;
+fEnergyTodayWh := 0.0;
+FOR i := 1 TO GVL_Param.FEED_COUNT DO
+    aFeeds[i].Allocate();
+    IF aFeeds[i].bValid THEN
+        fTotalPowerW := fTotalPowerW + MAX(0.0, aFeeds[i].stMeas.fPowerW);
+        fTotalAmps   := fTotalAmps + aFeeds[i].fAmps;
+    END_IF
+    fEnergyTodayWh := fEnergyTodayWh + GVL_Persist.aEnergyWh[i];
+END_FOR]]></ST>
     </Implementation>
   </POU>
 </TcPlcObject>
