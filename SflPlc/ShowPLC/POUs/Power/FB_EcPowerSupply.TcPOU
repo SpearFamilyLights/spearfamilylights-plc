@@ -1,0 +1,81 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="FB_EcPowerSupply" Id="{4896552b-4a4c-4531-b247-ae42dd90b096}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_EcPowerSupply
+VAR_INPUT
+    bSimulate : BOOL;  // TRUE: use the fSim values below instead of the process image
+END_VAR
+VAR_OUTPUT
+    bOnline          : BOOL;   // on the bus, in OP, data valid
+    bDcOk            : BOOL;   // output voltage above the supply's DC OK threshold (22 V by default)
+    bWarning         : BOOL;
+    bError           : BOOL;
+    fOutputVolts     : LREAL;  // V DC
+    fOutputAmps      : LREAL;  // A DC
+    bTempValid       : BOOL;
+    fTempC           : LREAL;  // from info data 1
+    bInputVoltsValid : BOOL;
+    fInputVolts      : LREAL;  // V AC RMS, from info data 2
+END_VAR
+VAR
+    // Process image. Linked in step 5.
+    bInWarning       AT %I* : BOOL;  // 6000:01 Warning
+    bInError         AT %I* : BOOL;  // 6000:02 Error
+    bInDcOk          AT %I* : BOOL;  // 6000:04 DC OK
+    fInOutputVoltage AT %I* : REAL;  // 6000:11 Output voltage, V
+    fInOutputCurrent AT %I* : REAL;  // 6000:12 Output current, A
+    nInInfoData1     AT %I* : UINT;  // 6000:15 Info data 1. Set 8001:19 = 14 (actual temperature)
+    nInInfoData2     AT %I* : UINT;  // 6000:16 Info data 2. Set 8001:21 = 10 (actual RMS input voltage)
+    bInWcState       AT %I* : BOOL;  // WcState. FALSE = data valid
+    nInState         AT %I* : UINT;  // InfoData > State. 8 = OP
+
+    // Simulation values. Change them online.
+    fSimVolts      : LREAL := 24.0;
+    fSimAmps       : LREAL := 5.0;
+    fSimTempC      : LREAL := 35.0;
+    fSimInputVolts : LREAL := 240.0;
+
+    bFinite : BOOL;
+    fVolts  : LREAL;
+    fAmps   : LREAL;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[IF bSimulate THEN
+    bOnline          := TRUE;
+    bDcOk            := TRUE;
+    bWarning         := FALSE;
+    bError           := FALSE;
+    fOutputVolts     := fSimVolts;
+    fOutputAmps      := fSimAmps;
+    fTempC           := fSimTempC;
+    fInputVolts      := fSimInputVolts;
+    bTempValid       := TRUE;
+    bInputVoltsValid := TRUE;
+ELSE
+    bFinite := TRUE;
+    fVolts  := F_CleanReal(fIn := fInOutputVoltage, bAllFinite := bFinite);
+    fAmps   := F_CleanReal(fIn := fInOutputCurrent, bAllFinite := bFinite);
+
+    bOnline  := (nInState = 8) AND (NOT bInWcState) AND bFinite;
+    // A supply that drops off the bus leaves its last values in the process image, so the bits only count while it is online.
+    bDcOk    := bOnline AND bInDcOk;
+    bWarning := bOnline AND bInWarning;
+    bError   := bOnline AND bInError;
+
+    IF bOnline THEN
+        fOutputVolts := MAX(0.0, fVolts);
+        fOutputAmps  := MAX(0.0, fAmps);
+        fTempC       := INT_TO_LREAL(UINT_TO_INT(nInInfoData1)) * GVL_Config.fPsuInfo1Scale;  // read as signed: a box can be below 0 degrees C
+        fInputVolts  := UINT_TO_LREAL(nInInfoData2) * GVL_Config.fPsuInfo2Scale;
+    ELSE
+        fOutputVolts := 0.0;
+        fOutputAmps  := 0.0;
+        fTempC       := 0.0;
+        fInputVolts  := 0.0;
+    END_IF
+    bTempValid       := bOnline AND (GVL_Config.fPsuInfo1Scale > 0.0);
+    bInputVoltsValid := bOnline AND (GVL_Config.fPsuInfo2Scale > 0.0);
+END_IF]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

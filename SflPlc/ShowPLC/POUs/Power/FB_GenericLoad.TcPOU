@@ -1,0 +1,72 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="FB_GenericLoad" Id="{81206029-0bf4-4449-9598-2df62091607f}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_GenericLoad IMPLEMENTS I_FeedLoad, I_JsonSource
+VAR_INPUT
+    stCfg : ST_GenericLoadConfig;  // this load's row of GVL_Config.aLoads
+END_VAR
+VAR_OUTPUT
+    fAcPowerW : LREAL;  // W counted against the feed
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[IF stCfg.bEnabled THEN
+    fAcPowerW := MAX(0.0, stCfg.fRatedPowerW);
+ELSE
+    fAcPowerW := 0.0;
+END_IF]]></ST>
+    </Implementation>
+    <Method Name="GetDemand" Id="{ee1d4dfe-af16-4a50-a7cc-63aad0f8d55b}">
+      <Declaration><![CDATA[METHOD GetDemand : ST_LoadDemand
+VAR
+    stDemand : ST_LoadDemand;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[stDemand.eKind     := E_LoadKind.Rated;
+stDemand.fAcPowerW := fAcPowerW;
+stDemand.fWeight   := 0.0;
+stDemand.bValid    := TRUE;
+GetDemand := stDemand;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="SetShare" Id="{58371d6a-c6e3-4a2f-bbe1-7130a556f46f}">
+      <Declaration><![CDATA[METHOD SetShare
+VAR_INPUT
+    fShareW     : LREAL;
+    bShareValid : BOOL;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// A rated load takes no share. The method exists because I_FeedLoad requires it.
+;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="WriteJson" Id="{53cadb08-a563-4c86-a640-34f108fc6153}">
+      <Declaration><![CDATA[METHOD WriteJson
+VAR_INPUT
+    eSection : E_JsonSection;
+END_VAR
+VAR_IN_OUT
+    fbJson : FB_JsonSaxWriter;
+END_VAR
+VAR
+    sFeed : STRING(20);
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF eSection <> E_JsonSection.Load THEN
+    RETURN;
+END_IF
+
+sFeed := F_FeedIdString(nFeedId := stCfg.nFeedId);
+
+fbJson.AddKey('id');
+fbJson.AddString(stCfg.sId);
+fbJson.AddKey('name');
+fbJson.AddString(stCfg.sName);
+fbJson.AddKey('feed');
+fbJson.AddString(sFeed);
+F_JsonNum(sKey := 'ratedW', fValue := stCfg.fRatedPowerW, bValid := TRUE, nDecimals := 0, fbJson := fbJson);
+fbJson.AddKey('on');
+fbJson.AddBool(stCfg.bEnabled);]]></ST>
+      </Implementation>
+    </Method>
+  </POU>
+</TcPlcObject>

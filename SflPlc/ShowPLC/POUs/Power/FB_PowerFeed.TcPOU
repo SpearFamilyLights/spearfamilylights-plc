@@ -1,0 +1,222 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="FB_PowerFeed" Id="{d452bfe4-ffb7-4da6-8819-7ddce9be059a}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_PowerFeed IMPLEMENTS I_JsonSource
+VAR_INPUT
+    stCfg   : ST_FeedConfig;  // this feed's row of GVL_Config.aFeeds
+    ipMeter : I_PowerMeter;   // where the measurement comes from
+END_VAR
+VAR_IN_OUT
+    fEnergyWh : LREAL;        // energy counter owned by the caller (persistent)
+END_VAR
+VAR_OUTPUT
+    bValid         : BOOL;              // the meter delivers valid data
+    bDegraded      : BOOL;              // a box with a supply on this feed is not reporting: estimates are too high
+    stMeas         : ST_AcMeasurement;  // filtered measurement
+    fAmps          : LREAL;             // A, the larger leg
+    fCableLossW    : LREAL;             // W lost in the infeed cable
+    fLoadPowerW    : LREAL;             // W at the loads: meter minus cable loss
+    fMeasuredW     : LREAL;             // W drawn by boxes with a supply
+    fRatedW        : LREAL;             // W of enabled generic loads
+    fUnmeteredW    : LREAL;             // W split across boxes without a supply
+    fUnaccountedW  : LREAL;             // W left over. Not zero means the model is off
+    fEnergyTodayWh : LREAL;             // copy of the counter for telemetry
+    nLoadCount     : INT;               // loads registered this cycle
+END_VAR
+VAR
+    stRaw     : ST_AcMeasurement;
+    aLoads    : ARRAY[1..GVL_Param.MAX_LOADS_PER_FEED] OF I_FeedLoad;
+    bMeterOk  : BOOL;
+    fCycleS   : LREAL;
+    fTau      : LREAL;
+    fOhms     : LREAL;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[fCycleS := F_CycleTimeS();
+fTau    := GVL_Config.fFilterTimeS;
+
+// 1. Read the meter
+bMeterOk := FALSE;
+IF ipMeter <> 0 THEN
+    bMeterOk := ipMeter.Read(stMeas := stRaw);
+END_IF
+
+// 2. Filter what the power balance uses. Everything else is passed through.
+IF bMeterOk THEN
+    IF bValid THEN
+        stRaw.fAmpsL1       := F_LowPass(fState := stMeas.fAmpsL1,       fInput := stRaw.fAmpsL1,       fTimeS := fTau, fCycleS := fCycleS);
+        stRaw.fAmpsL2       := F_LowPass(fState := stMeas.fAmpsL2,       fInput := stRaw.fAmpsL2,       fTimeS := fTau, fCycleS := fCycleS);
+        stRaw.fAmpsResidual := F_LowPass(fState := stMeas.fAmpsResidual, fInput := stRaw.fAmpsResidual, fTimeS := fTau, fCycleS := fCycleS);
+        stRaw.fPowerW       := F_LowPass(fState := stMeas.fPowerW,       fInput := stRaw.fPowerW,       fTimeS := fTau, fCycleS := fCycleS);
+        stRaw.fApparentVA   := F_LowPass(fState := stMeas.fApparentVA,   fInput := stRaw.fApparentVA,   fTimeS := fTau, fCycleS := fCycleS);
+    END_IF
+    stMeas := stRaw;  // on the first valid sample this is the raw value: no filter run-in
+END_IF
+bValid := bMeterOk;
+stMeas.bValid := bMeterOk;
+
+// 3. Cable loss. The ground conductor carries no load current, so two conductors count.
+fAmps := MAX(stMeas.fAmpsL1, stMeas.fAmpsL2);
+fOhms := MAX(0.0, stCfg.fInfeedLengthFt) * MAX(0.0, stCfg.fInfeedOhmPerKft) / 1000.0;
+fCableLossW := fOhms * (stMeas.fAmpsL1 * stMeas.fAmpsL1 + stMeas.fAmpsL2 * stMeas.fAmpsL2);
+fLoadPowerW := MAX(0.0, stMeas.fPowerW - fCableLossW);
+
+// 4. Energy since local midnight. TF8330 has no energy counters, so it is integrated here.
+IF bValid THEN
+    fEnergyWh := fEnergyWh + MAX(0.0, stMeas.fPowerW) * fCycleS / 3600.0;
+END_IF
+fEnergyTodayWh := fEnergyWh;
+
+// 5. New load list. MAIN hands every load in again each cycle, so no reference outlives a cycle.
+nLoadCount := 0;]]></ST>
+    </Implementation>
+    <Method Name="AddLoad" Id="{0079357d-eb84-4855-b6d7-eb4aa649fc4d}">
+      <Declaration><![CDATA[// Registers a load for this cycle. Returns FALSE when the list is full.
+METHOD AddLoad : BOOL
+VAR_INPUT
+    ipLoad : I_FeedLoad;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[AddLoad := FALSE;
+IF (ipLoad <> 0) AND (nLoadCount < GVL_Param.MAX_LOADS_PER_FEED) THEN
+    nLoadCount := nLoadCount + 1;
+    aLoads[nLoadCount] := ipLoad;
+    AddLoad := TRUE;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Allocate" Id="{83c4977c-b607-4681-b554-41b91ad93bd4}">
+      <Declaration><![CDATA[// Call once per cycle after every load has been added.
+METHOD Allocate
+VAR
+    i          : INT;
+    stDemand   : ST_LoadDemand;
+    fWeightSum : LREAL;
+    fRest      : LREAL;
+    fShare     : LREAL;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[fMeasuredW := 0.0;
+fRatedW    := 0.0;
+fWeightSum := 0.0;
+bDegraded  := FALSE;
+
+// Pass 1: add up what is known
+FOR i := 1 TO nLoadCount DO
+    stDemand := aLoads[i].GetDemand();
+    CASE stDemand.eKind OF
+        E_LoadKind.Measured:
+            IF stDemand.bValid THEN
+                fMeasuredW := fMeasuredW + MAX(0.0, stDemand.fAcPowerW);
+            ELSE
+                bDegraded := TRUE;
+            END_IF
+        E_LoadKind.Rated:
+            fRatedW := fRatedW + MAX(0.0, stDemand.fAcPowerW);
+        E_LoadKind.Estimated:
+            fWeightSum := fWeightSum + MAX(0.0, stDemand.fWeight);
+    END_CASE
+END_FOR
+
+// What is left for the boxes without a supply
+fRest := MAX(0.0, fLoadPowerW - fMeasuredW - fRatedW);
+IF fWeightSum > 0.0 THEN
+    fUnmeteredW := fRest;
+ELSE
+    fUnmeteredW := 0.0;
+END_IF
+fUnaccountedW := fLoadPowerW - fMeasuredW - fRatedW - fUnmeteredW;
+
+// Pass 2: hand out the shares by weight
+FOR i := 1 TO nLoadCount DO
+    stDemand := aLoads[i].GetDemand();
+    IF stDemand.eKind = E_LoadKind.Estimated THEN
+        IF fWeightSum > 0.0 THEN
+            fShare := fRest * MAX(0.0, stDemand.fWeight) / fWeightSum;
+        ELSE
+            fShare := 0.0;
+        END_IF
+        aLoads[i].SetShare(fShareW := fShare, bShareValid := bValid);
+    END_IF
+END_FOR]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="WriteJson" Id="{2a15b12e-5c8c-4cca-960c-cee71cea1e46}">
+      <Declaration><![CDATA[METHOD WriteJson
+VAR_INPUT
+    eSection : E_JsonSection;
+END_VAR
+VAR_IN_OUT
+    fbJson : FB_JsonSaxWriter;
+END_VAR
+VAR
+    bLegsLive : BOOL;
+    bThdOk    : BOOL;
+    bHarmOk   : BOOL;
+    stHarm    : ST_Harmonics;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[CASE eSection OF
+
+    E_JsonSection.Circuit:
+        bLegsLive := bValid AND (stMeas.fVoltsL1 > GVL_Config.fVoltsPresentMin) AND (stMeas.fVoltsL2 > GVL_Config.fVoltsPresentMin);
+        fbJson.AddKey('id');
+        fbJson.AddString(stCfg.sId);
+        fbJson.AddKey('name');
+        fbJson.AddString(stCfg.sName);
+        fbJson.AddKey('on');
+        fbJson.AddBool(bLegsLive);
+        F_JsonNum(sKey := 'amps', fValue := fAmps, bValid := bValid, nDecimals := 2, fbJson := fbJson);
+
+    E_JsonSection.Feed:
+        bThdOk := bValid AND stMeas.bThdValid;
+        fbJson.AddKey('id');
+        fbJson.AddString(stCfg.sId);
+        fbJson.AddKey('name');
+        fbJson.AddString(stCfg.sName);
+        fbJson.AddKey('ok');
+        fbJson.AddBool(bValid);
+        fbJson.AddKey('degraded');
+        fbJson.AddBool(bDegraded);
+        F_JsonNum(sKey := 'maxAmps',       fValue := stCfg.fMaxAmps,         bValid := TRUE,   nDecimals := 1, fbJson := fbJson);
+        F_JsonNum(sKey := 'amps',          fValue := fAmps,                  bValid := bValid, nDecimals := 2, fbJson := fbJson);
+        F_JsonNum(sKey := 'ampsL1',        fValue := stMeas.fAmpsL1,         bValid := bValid, nDecimals := 2, fbJson := fbJson);
+        F_JsonNum(sKey := 'ampsL2',        fValue := stMeas.fAmpsL2,         bValid := bValid, nDecimals := 2, fbJson := fbJson);
+        F_JsonNum(sKey := 'ampsResidual',  fValue := stMeas.fAmpsResidual,   bValid := bValid, nDecimals := 3, fbJson := fbJson);
+        F_JsonNum(sKey := 'voltsL1',       fValue := stMeas.fVoltsL1,        bValid := bValid, nDecimals := 1, fbJson := fbJson);
+        F_JsonNum(sKey := 'voltsL2',       fValue := stMeas.fVoltsL2,        bValid := bValid, nDecimals := 1, fbJson := fbJson);
+        F_JsonNum(sKey := 'voltsLL',       fValue := stMeas.fVoltsLL,        bValid := bValid, nDecimals := 1, fbJson := fbJson);
+        F_JsonNum(sKey := 'powerW',        fValue := stMeas.fPowerW,         bValid := bValid, nDecimals := 1, fbJson := fbJson);
+        F_JsonNum(sKey := 'apparentVA',    fValue := stMeas.fApparentVA,     bValid := bValid, nDecimals := 1, fbJson := fbJson);
+        F_JsonNum(sKey := 'pf',            fValue := stMeas.fPowerFactor,    bValid := bValid, nDecimals := 2, fbJson := fbJson);
+        F_JsonNum(sKey := 'hz',            fValue := stMeas.fFrequencyHz,    bValid := bValid, nDecimals := 2, fbJson := fbJson);
+        F_JsonNum(sKey := 'thdVoltsL1',    fValue := stMeas.fThdVoltsL1,     bValid := bThdOk, nDecimals := 1, fbJson := fbJson);
+        F_JsonNum(sKey := 'thdVoltsL2',    fValue := stMeas.fThdVoltsL2,     bValid := bThdOk, nDecimals := 1, fbJson := fbJson);
+        F_JsonNum(sKey := 'thdAmpsL1',     fValue := stMeas.fThdAmpsL1,      bValid := bThdOk, nDecimals := 1, fbJson := fbJson);
+        F_JsonNum(sKey := 'thdAmpsL2',     fValue := stMeas.fThdAmpsL2,      bValid := bThdOk, nDecimals := 1, fbJson := fbJson);
+        F_JsonNum(sKey := 'cableLossW',    fValue := fCableLossW,            bValid := bValid, nDecimals := 1, fbJson := fbJson);
+        F_JsonNum(sKey := 'measuredW',     fValue := fMeasuredW,             bValid := bValid, nDecimals := 1, fbJson := fbJson);
+        F_JsonNum(sKey := 'ratedW',        fValue := fRatedW,                bValid := TRUE,   nDecimals := 1, fbJson := fbJson);
+        F_JsonNum(sKey := 'unmeteredW',    fValue := fUnmeteredW,            bValid := bValid, nDecimals := 1, fbJson := fbJson);
+        F_JsonNumSigned(sKey := 'unaccountedW', fValue := fUnaccountedW,     bValid := bValid, nDecimals := 1, fbJson := fbJson);
+        F_JsonNum(sKey := 'energyTodayWh', fValue := fEnergyTodayWh,         bValid := TRUE,   nDecimals := 0, fbJson := fbJson);
+
+    E_JsonSection.Harmonics:
+        bHarmOk := FALSE;
+        IF ipMeter <> 0 THEN
+            bHarmOk := ipMeter.ReadHarmonics(stHarm := stHarm);
+        END_IF
+        fbJson.AddKey('id');
+        fbJson.AddString(stCfg.sId);
+        fbJson.AddKey('ok');
+        fbJson.AddBool(bHarmOk);
+        F_JsonHarmArray(sKey := 'ampsL1',  bValid := bHarmOk, fbJson := fbJson, aValues := stHarm.aAmpsL1);
+        F_JsonHarmArray(sKey := 'ampsL2',  bValid := bHarmOk, fbJson := fbJson, aValues := stHarm.aAmpsL2);
+        F_JsonHarmArray(sKey := 'voltsL1', bValid := bHarmOk, fbJson := fbJson, aValues := stHarm.aVoltsL1);
+        F_JsonHarmArray(sKey := 'voltsL2', bValid := bHarmOk, fbJson := fbJson, aValues := stHarm.aVoltsL2);
+
+END_CASE]]></ST>
+      </Implementation>
+    </Method>
+  </POU>
+</TcPlcObject>

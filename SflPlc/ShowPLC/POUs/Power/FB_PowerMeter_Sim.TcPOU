@@ -1,0 +1,82 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="FB_PowerMeter_Sim" Id="{a0d2c999-c98f-42fd-8ee3-9828e365ae82}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_PowerMeter_Sim IMPLEMENTS I_PowerMeter
+VAR_INPUT
+    bOnline      : BOOL := TRUE;    // FALSE simulates a dead meter
+    fVoltsLeg    : LREAL := 120.0;  // V, each leg to ground
+    fPowerW      : LREAL := 400.0;  // W, total active power of the feed
+    fPowerFactor : LREAL := 0.98;
+    fResidualA   : LREAL := 0.0;    // A
+    fThdVoltsPct : LREAL := 2.0;
+    fThdAmpsPct  : LREAL := 11.0;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[// Nothing to do here. The feed calls Read() and ReadHarmonics().
+;]]></ST>
+    </Implementation>
+    <Method Name="Read" Id="{2208e309-820a-4e92-a620-96e40a3abc9e}">
+      <Declaration><![CDATA[METHOD Read : BOOL
+VAR_IN_OUT
+    stMeas : ST_AcMeasurement;
+END_VAR
+VAR
+    fPf : LREAL;
+    fVa : LREAL;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[fPf := LIMIT(0.1, fPowerFactor, 1.0);
+fVa := MAX(0.0, fPowerW) / fPf;
+
+stMeas.bValid        := bOnline;
+stMeas.bThdValid     := bOnline;
+stMeas.fVoltsL1      := fVoltsLeg;
+stMeas.fVoltsL2      := fVoltsLeg;
+stMeas.fVoltsLL      := 2.0 * fVoltsLeg;
+IF fVoltsLeg > 1.0 THEN
+    stMeas.fAmpsL1 := fVa / (2.0 * fVoltsLeg);
+ELSE
+    stMeas.fAmpsL1 := 0.0;
+END_IF
+stMeas.fAmpsL2       := stMeas.fAmpsL1;
+stMeas.fAmpsResidual := MAX(0.0, fResidualA);
+stMeas.fPowerW       := MAX(0.0, fPowerW);
+stMeas.fApparentVA   := fVa;
+stMeas.fPowerFactor  := fPf;
+stMeas.fFrequencyHz  := 60.0;
+stMeas.fThdVoltsL1   := fThdVoltsPct;
+stMeas.fThdVoltsL2   := fThdVoltsPct;
+stMeas.fThdAmpsL1    := fThdAmpsPct;
+stMeas.fThdAmpsL2    := fThdAmpsPct;
+
+Read := bOnline;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="ReadHarmonics" Id="{c1432525-0897-43cf-9d9c-ebebfceb4e13}">
+      <Declaration><![CDATA[METHOD ReadHarmonics : BOOL
+VAR_IN_OUT
+    stHarm : ST_Harmonics;
+END_VAR
+VAR
+    n : INT;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// A plausible switch-mode supply spectrum: odd orders falling off with the order, even orders near zero.
+FOR n := 2 TO GVL_Param.HARMONIC_MAX_ORDER DO
+    IF (n MOD 2) = 1 THEN
+        stHarm.aAmpsL1[n]  := fThdAmpsPct * 2.2 / INT_TO_LREAL(n);
+        stHarm.aVoltsL1[n] := fThdVoltsPct * 2.2 / INT_TO_LREAL(n);
+    ELSE
+        stHarm.aAmpsL1[n]  := 0.2;
+        stHarm.aVoltsL1[n] := 0.1;
+    END_IF
+    stHarm.aAmpsL2[n]  := stHarm.aAmpsL1[n];
+    stHarm.aVoltsL2[n] := stHarm.aVoltsL1[n];
+END_FOR
+stHarm.bValid := bOnline;
+
+ReadHarmonics := bOnline;]]></ST>
+      </Implementation>
+    </Method>
+  </POU>
+</TcPlcObject>
