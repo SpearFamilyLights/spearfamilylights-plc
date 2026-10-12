@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1">
-  <POU Name="FB_SatteliteController" Id="{fd4bea5b-c411-438a-8000-f3f90d5fc734}" SpecialFunc="None">
-    <Declaration><![CDATA[FUNCTION_BLOCK FB_SatelliteController IMPLEMENTS I_FeedLoad, I_JsonSource
+  <POU Name="FB_SateliteController" Id="{fd4bea5b-c411-438a-8000-f3f90d5fc734}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_SateliteController IMPLEMENTS I_FeedLoad, I_JsonSource
 VAR_INPUT
     stCfg : ST_BoxConfig;  // this box's row of GVL_Config.aBoxes
 END_VAR

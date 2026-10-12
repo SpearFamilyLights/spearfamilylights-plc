@@ -84,7 +84,7 @@
     <Compile Include="POUs\Power\FB_PowerMeter_Sim.TcPOU">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="POUs\Power\FB_SatteliteController.TcPOU">
+    <Compile Include="POUs\Power\FB_SateliteController.TcPOU">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="POUs\Util\F_CleanReal.TcPOU">
@@ -108,7 +108,7 @@
     <Compile Include="POUs\Util\F_JsonNumSigned.TcPOU">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="POUs\Util\F_LowPas.TcPOU">
+    <Compile Include="POUs\Util\F_LowPass.TcPOU">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>

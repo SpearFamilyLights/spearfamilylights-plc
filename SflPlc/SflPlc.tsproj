@@ -3784,11 +3784,11 @@
 							</Parameter>
 							<Parameter HideParameter="true" DisableCodeGeneration="true" ReadOnly="true">
 								<Name>DataAreaConfigMeasures</Name>
-								<BitSize>384</BitSize>
+								<BitSize>1024</BitSize>
 								<BaseType GUID="{BD3BA8A6-FB59-4197-B6BA-A3B09FFC369C}" Namespace="IO">TcIoDataAreaCfg</BaseType>
 								<ArrayInfo>
 									<LBound>0</LBound>
-									<Elements Min="0" MaxUnbounded="true">3</Elements>
+									<Elements Min="0" MaxUnbounded="true">8</Elements>
 								</ArrayInfo>
 								<PTCID>#x0300700a</PTCID>
 								<ContextId>1</ContextId>
@@ -3796,7 +3796,7 @@
 						</Parameters>
 						<DataAreas>
 							<DataArea DisableCodeGeneration="true">
-								<AreaNo AreaType="InputDst" FlexibleArea="true">1</AreaNo>
+								<AreaNo AreaType="InputDst" ShowSymbols="true" FlexibleArea="true">1</AreaNo>
 								<Name>Inputs</Name>
 								<ContextId>1</ContextId>
 								<ByteSize>136</ByteSize>
@@ -3834,7 +3834,7 @@
 								</Symbol>
 							</DataArea>
 							<DataArea DisableCodeGeneration="true">
-								<AreaNo AreaType="OutputSrc" FlexibleArea="true">2</AreaNo>
+								<AreaNo AreaType="OutputSrc" ShowSymbols="true" FlexibleArea="true">2</AreaNo>
 								<Name>Outputs</Name>
 								<ContextId>1</ContextId>
 								<ByteSize>0</ByteSize>
@@ -3858,10 +3858,10 @@
 								</Symbol>
 							</DataArea>
 							<DataArea DisableCodeGeneration="true">
-								<AreaNo AreaType="OutputSrc" CreateSymbols="true" FlexibleArea="true">10</AreaNo>
+								<AreaNo AreaType="OutputSrc" CreateSymbols="true" ShowSymbols="true" FlexibleArea="true">10</AreaNo>
 								<Name>Measures</Name>
 								<ContextId>1</ContextId>
-								<ByteSize>152</ByteSize>
+								<ByteSize>1936</ByteSize>
 								<Symbol FixedSymbol="true">
 									<Name>Diag</Name>
 									<BitSize>64</BitSize>
@@ -3869,49 +3869,54 @@
 									<PTCID>#x8a010000</PTCID>
 									<BitOffs>0</BitOffs>
 								</Symbol>
-								<Symbol Disabled="true">
+								<Symbol>
 									<Name>Voltage</Name>
 									<BitSize>352</BitSize>
 									<BaseType GUID="{B2C7C7A1-F9CF-421C-AB8E-33669B9A9642}">STcPowerMeasureVoltageArea</BaseType>
 									<PTCID>#x8a020000</PTCID>
+									<BitOffs>64</BitOffs>
 								</Symbol>
-								<Symbol Disabled="true">
+								<Symbol>
 									<Name>Current</Name>
 									<BitSize>288</BitSize>
 									<BaseType GUID="{21B55AD6-375C-4410-B781-A1038DD2C34A}">STcPowerMeasureCurrentArea</BaseType>
 									<PTCID>#x8a030000</PTCID>
+									<BitOffs>416</BitOffs>
 								</Symbol>
 								<Symbol>
 									<Name>Frequency</Name>
 									<BitSize>288</BitSize>
 									<BaseType GUID="{05C90587-F90F-4A4B-B2CA-62A41765E161}">STcPowerMeasureFrequencyArea</BaseType>
 									<PTCID>#x8a040000</PTCID>
-									<BitOffs>64</BitOffs>
+									<BitOffs>704</BitOffs>
 								</Symbol>
 								<Symbol>
 									<Name>Effective</Name>
 									<BitSize>864</BitSize>
 									<BaseType GUID="{364B5757-7CFD-4E44-9068-0F670AEDFFA3}">STcPowerMeasureEffectiveArea</BaseType>
 									<PTCID>#x8a050000</PTCID>
-									<BitOffs>352</BitOffs>
+									<BitOffs>992</BitOffs>
 								</Symbol>
-								<Symbol Disabled="true">
+								<Symbol>
 									<Name>Fundamental</Name>
 									<BitSize>864</BitSize>
 									<BaseType GUID="{73AF3843-7610-4B7D-9C86-41BE79D1B8CF}">STcPowerMeasureFundamentalArea</BaseType>
 									<PTCID>#x8a060000</PTCID>
+									<BitOffs>1856</BitOffs>
 								</Symbol>
-								<Symbol Disabled="true">
+								<Symbol>
 									<Name>Harmonics</Name>
 									<BitSize>12384</BitSize>
 									<BaseType GUID="{F3000463-87D4-49A2-A6E7-48DEC997582D}">STcPowerMeasureHarmonicsArea</BaseType>
 									<PTCID>#x8a070000</PTCID>
+									<BitOffs>2720</BitOffs>
 								</Symbol>
-								<Symbol Disabled="true">
+								<Symbol>
 									<Name>Distortion</Name>
 									<BitSize>384</BitSize>
 									<BaseType GUID="{FF5C5F39-20F6-49CE-919B-48E855B5A257}">STcPowerMeasureDistortionArea</BaseType>
 									<PTCID>#x8a080000</PTCID>
+									<BitOffs>15104</BitOffs>
 								</Symbol>
 							</DataArea>
 						</DataAreas>
@@ -4047,7 +4052,7 @@
 							</Value>
 							<Value>
 								<Name>DataAreaSizes[2].size</Name>
-								<Value>152</Value>
+								<Value>1936</Value>
 							</Value>
 							<Value>
 								<Name>DataAreaConfigInputs[0].pid</Name>
@@ -4099,11 +4104,11 @@
 							</Value>
 							<Value>
 								<Name>DataAreaConfigMeasures[1].pid</Name>
-								<Value>2315517952</Value>
+								<Value>2315386880</Value>
 							</Value>
 							<Value>
 								<Name>DataAreaConfigMeasures[1].bitSize</Name>
-								<Value>288</Value>
+								<Value>352</Value>
 							</Value>
 							<Value>
 								<Name>DataAreaConfigMeasures[1].bitOffs</Name>
@@ -4115,18 +4120,98 @@
 							</Value>
 							<Value>
 								<Name>DataAreaConfigMeasures[2].pid</Name>
-								<Value>2315583488</Value>
+								<Value>2315452416</Value>
 							</Value>
 							<Value>
 								<Name>DataAreaConfigMeasures[2].bitSize</Name>
-								<Value>864</Value>
+								<Value>288</Value>
 							</Value>
 							<Value>
 								<Name>DataAreaConfigMeasures[2].bitOffs</Name>
-								<Value>352</Value>
+								<Value>416</Value>
 							</Value>
 							<Value>
 								<Name>DataAreaConfigMeasures[2].mappingState</Name>
+								<EnumText>MS_Unmapped</EnumText>
+							</Value>
+							<Value>
+								<Name>DataAreaConfigMeasures[3].pid</Name>
+								<Value>2315517952</Value>
+							</Value>
+							<Value>
+								<Name>DataAreaConfigMeasures[3].bitSize</Name>
+								<Value>288</Value>
+							</Value>
+							<Value>
+								<Name>DataAreaConfigMeasures[3].bitOffs</Name>
+								<Value>704</Value>
+							</Value>
+							<Value>
+								<Name>DataAreaConfigMeasures[3].mappingState</Name>
+								<EnumText>MS_Unmapped</EnumText>
+							</Value>
+							<Value>
+								<Name>DataAreaConfigMeasures[4].pid</Name>
+								<Value>2315583488</Value>
+							</Value>
+							<Value>
+								<Name>DataAreaConfigMeasures[4].bitSize</Name>
+								<Value>864</Value>
+							</Value>
+							<Value>
+								<Name>DataAreaConfigMeasures[4].bitOffs</Name>
+								<Value>992</Value>
+							</Value>
+							<Value>
+								<Name>DataAreaConfigMeasures[4].mappingState</Name>
+								<EnumText>MS_Unmapped</EnumText>
+							</Value>
+							<Value>
+								<Name>DataAreaConfigMeasures[5].pid</Name>
+								<Value>2315649024</Value>
+							</Value>
+							<Value>
+								<Name>DataAreaConfigMeasures[5].bitSize</Name>
+								<Value>864</Value>
+							</Value>
+							<Value>
+								<Name>DataAreaConfigMeasures[5].bitOffs</Name>
+								<Value>1856</Value>
+							</Value>
+							<Value>
+								<Name>DataAreaConfigMeasures[5].mappingState</Name>
+								<EnumText>MS_Unmapped</EnumText>
+							</Value>
+							<Value>
+								<Name>DataAreaConfigMeasures[6].pid</Name>
+								<Value>2315714560</Value>
+							</Value>
+							<Value>
+								<Name>DataAreaConfigMeasures[6].bitSize</Name>
+								<Value>12384</Value>
+							</Value>
+							<Value>
+								<Name>DataAreaConfigMeasures[6].bitOffs</Name>
+								<Value>2720</Value>
+							</Value>
+							<Value>
+								<Name>DataAreaConfigMeasures[6].mappingState</Name>
+								<EnumText>MS_Unmapped</EnumText>
+							</Value>
+							<Value>
+								<Name>DataAreaConfigMeasures[7].pid</Name>
+								<Value>2315780096</Value>
+							</Value>
+							<Value>
+								<Name>DataAreaConfigMeasures[7].bitSize</Name>
+								<Value>384</Value>
+							</Value>
+							<Value>
+								<Name>DataAreaConfigMeasures[7].bitOffs</Name>
+								<Value>15104</Value>
+							</Value>
+							<Value>
+								<Name>DataAreaConfigMeasures[7].mappingState</Name>
 								<EnumText>MS_Unmapped</EnumText>
 							</Value>
 						</ParameterValues>
@@ -4524,11 +4609,11 @@
 							</Parameter>
 							<Parameter HideParameter="true" DisableCodeGeneration="true" ReadOnly="true">
 								<Name>DataAreaConfigMeasures</Name>
-								<BitSize>384</BitSize>
+								<BitSize>1024</BitSize>
 								<BaseType GUID="{BD3BA8A6-FB59-4197-B6BA-A3B09FFC369C}" Namespace="IO">TcIoDataAreaCfg</BaseType>
 								<ArrayInfo>
 									<LBound>0</LBound>
-									<Elements Min="0" MaxUnbounded="true">3</Elements>
+									<Elements Min="0" MaxUnbounded="true">8</Elements>
 								</ArrayInfo>
 								<PTCID>#x0300700a</PTCID>
 								<ContextId>1</ContextId>
@@ -4598,10 +4683,10 @@
 								</Symbol>
 							</DataArea>
 							<DataArea DisableCodeGeneration="true">
-								<AreaNo AreaType="OutputSrc" CreateSymbols="true" FlexibleArea="true">10</AreaNo>
+								<AreaNo AreaType="OutputSrc" CreateSymbols="true" ShowSymbols="true" FlexibleArea="true">10</AreaNo>
 								<Name>Measures</Name>
 								<ContextId>1</ContextId>
-								<ByteSize>152</ByteSize>
+								<ByteSize>1936</ByteSize>
 								<Symbol FixedSymbol="true">
 									<Name>Diag</Name>
 									<BitSize>64</BitSize>
@@ -4609,49 +4694,54 @@
 									<PTCID>#x8a010000</PTCID>
 									<BitOffs>0</BitOffs>
 								</Symbol>
-								<Symbol Disabled="true">
+								<Symbol>
 									<Name>Voltage</Name>
 									<BitSize>352</BitSize>
 									<BaseType GUID="{B2C7C7A1-F9CF-421C-AB8E-33669B9A9642}">STcPowerMeasureVoltageArea</BaseType>
 									<PTCID>#x8a020000</PTCID>
+									<BitOffs>64</BitOffs>
 								</Symbol>
-								<Symbol Disabled="true">
+								<Symbol>
 									<Name>Current</Name>
 									<BitSize>288</BitSize>
 									<BaseType GUID="{21B55AD6-375C-4410-B781-A1038DD2C34A}">STcPowerMeasureCurrentArea</BaseType>
 									<PTCID>#x8a030000</PTCID>
+									<BitOffs>416</BitOffs>
 								</Symbol>
 								<Symbol>
 									<Name>Frequency</Name>
 									<BitSize>288</BitSize>
 									<BaseType GUID="{05C90587-F90F-4A4B-B2CA-62A41765E161}">STcPowerMeasureFrequencyArea</BaseType>
 									<PTCID>#x8a040000</PTCID>
-									<BitOffs>64</BitOffs>
+									<BitOffs>704</BitOffs>
 								</Symbol>
 								<Symbol>
 									<Name>Effective</Name>
 									<BitSize>864</BitSize>
 									<BaseType GUID="{364B5757-7CFD-4E44-9068-0F670AEDFFA3}">STcPowerMeasureEffectiveArea</BaseType>
 									<PTCID>#x8a050000</PTCID>
-									<BitOffs>352</BitOffs>
+									<BitOffs>992</BitOffs>
 								</Symbol>
-								<Symbol Disabled="true">
+								<Symbol>
 									<Name>Fundamental</Name>
 									<BitSize>864</BitSize>
 									<BaseType GUID="{73AF3843-7610-4B7D-9C86-41BE79D1B8CF}">STcPowerMeasureFundamentalArea</BaseType>
 									<PTCID>#x8a060000</PTCID>
+									<BitOffs>1856</BitOffs>
 								</Symbol>
-								<Symbol Disabled="true">
+								<Symbol>
 									<Name>Harmonics</Name>
 									<BitSize>12384</BitSize>
 									<BaseType GUID="{F3000463-87D4-49A2-A6E7-48DEC997582D}">STcPowerMeasureHarmonicsArea</BaseType>
 									<PTCID>#x8a070000</PTCID>
+									<BitOffs>2720</BitOffs>
 								</Symbol>
-								<Symbol Disabled="true">
+								<Symbol>
 									<Name>Distortion</Name>
 									<BitSize>384</BitSize>
 									<BaseType GUID="{FF5C5F39-20F6-49CE-919B-48E855B5A257}">STcPowerMeasureDistortionArea</BaseType>
 									<PTCID>#x8a080000</PTCID>
+									<BitOffs>15104</BitOffs>
 								</Symbol>
 							</DataArea>
 						</DataAreas>
@@ -4787,7 +4877,7 @@
 							</Value>
 							<Value>
 								<Name>DataAreaSizes[2].size</Name>
-								<Value>152</Value>
+								<Value>1936</Value>
 							</Value>
 							<Value>
 								<Name>DataAreaConfigInputs[0].pid</Name>
@@ -4839,11 +4929,11 @@
 							</Value>
 							<Value>
 								<Name>DataAreaConfigMeasures[1].pid</Name>
-								<Value>2315517952</Value>
+								<Value>2315386880</Value>
 							</Value>
 							<Value>
 								<Name>DataAreaConfigMeasures[1].bitSize</Name>
-								<Value>288</Value>
+								<Value>352</Value>
 							</Value>
 							<Value>
 								<Name>DataAreaConfigMeasures[1].bitOffs</Name>
@@ -4855,18 +4945,98 @@
 							</Value>
 							<Value>
 								<Name>DataAreaConfigMeasures[2].pid</Name>
-								<Value>2315583488</Value>
+								<Value>2315452416</Value>
 							</Value>
 							<Value>
 								<Name>DataAreaConfigMeasures[2].bitSize</Name>
-								<Value>864</Value>
+								<Value>288</Value>
 							</Value>
 							<Value>
 								<Name>DataAreaConfigMeasures[2].bitOffs</Name>
-								<Value>352</Value>
+								<Value>416</Value>
 							</Value>
 							<Value>
 								<Name>DataAreaConfigMeasures[2].mappingState</Name>
+								<EnumText>MS_Unmapped</EnumText>
+							</Value>
+							<Value>
+								<Name>DataAreaConfigMeasures[3].pid</Name>
+								<Value>2315517952</Value>
+							</Value>
+							<Value>
+								<Name>DataAreaConfigMeasures[3].bitSize</Name>
+								<Value>288</Value>
+							</Value>
+							<Value>
+								<Name>DataAreaConfigMeasures[3].bitOffs</Name>
+								<Value>704</Value>
+							</Value>
+							<Value>
+								<Name>DataAreaConfigMeasures[3].mappingState</Name>
+								<EnumText>MS_Unmapped</EnumText>
+							</Value>
+							<Value>
+								<Name>DataAreaConfigMeasures[4].pid</Name>
+								<Value>2315583488</Value>
+							</Value>
+							<Value>
+								<Name>DataAreaConfigMeasures[4].bitSize</Name>
+								<Value>864</Value>
+							</Value>
+							<Value>
+								<Name>DataAreaConfigMeasures[4].bitOffs</Name>
+								<Value>992</Value>
+							</Value>
+							<Value>
+								<Name>DataAreaConfigMeasures[4].mappingState</Name>
+								<EnumText>MS_Unmapped</EnumText>
+							</Value>
+							<Value>
+								<Name>DataAreaConfigMeasures[5].pid</Name>
+								<Value>2315649024</Value>
+							</Value>
+							<Value>
+								<Name>DataAreaConfigMeasures[5].bitSize</Name>
+								<Value>864</Value>
+							</Value>
+							<Value>
+								<Name>DataAreaConfigMeasures[5].bitOffs</Name>
+								<Value>1856</Value>
+							</Value>
+							<Value>
+								<Name>DataAreaConfigMeasures[5].mappingState</Name>
+								<EnumText>MS_Unmapped</EnumText>
+							</Value>
+							<Value>
+								<Name>DataAreaConfigMeasures[6].pid</Name>
+								<Value>2315714560</Value>
+							</Value>
+							<Value>
+								<Name>DataAreaConfigMeasures[6].bitSize</Name>
+								<Value>12384</Value>
+							</Value>
+							<Value>
+								<Name>DataAreaConfigMeasures[6].bitOffs</Name>
+								<Value>2720</Value>
+							</Value>
+							<Value>
+								<Name>DataAreaConfigMeasures[6].mappingState</Name>
+								<EnumText>MS_Unmapped</EnumText>
+							</Value>
+							<Value>
+								<Name>DataAreaConfigMeasures[7].pid</Name>
+								<Value>2315780096</Value>
+							</Value>
+							<Value>
+								<Name>DataAreaConfigMeasures[7].bitSize</Name>
+								<Value>384</Value>
+							</Value>
+							<Value>
+								<Name>DataAreaConfigMeasures[7].bitOffs</Name>
+								<Value>15104</Value>
+							</Value>
+							<Value>
+								<Name>DataAreaConfigMeasures[7].mappingState</Name>
 								<EnumText>MS_Unmapped</EnumText>
 							</Value>
 						</ParameterValues>

@@ -5,7 +5,7 @@
 VAR_GLOBAL CONSTANT
     FEED_COUNT         : INT := 2;
     BOX_COUNT          : INT := 9;
-    LOAD_COUNT         : INT := 2;
+    LOAD_COUNT         : INT := 3;
     MAX_LOADS_PER_FEED : INT := GVL_Param.BOX_COUNT + GVL_Param.LOAD_COUNT;
     HARMONIC_MAX_ORDER : INT := 25;  // highest harmonic order kept and published. 2..63
 END_VAR]]></Declaration>
