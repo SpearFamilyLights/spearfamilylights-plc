@@ -1,0 +1,34 @@
+# TwinCAT 3: generated on every build or activation
+_Boot/
+_CompileInfo/
+_Libraries/
+_ModuleInstall/
+_Deployment/
+_Repository/
+*.tpy
+*.tclrs
+*.compileinfo
+*.library
+*.compiled-library
+*.core
+*.bootinfo
+*.bootinfo_guids
+*.tmcRefac
+LineIDs.dbg
+LineIDs.dbg.bak
+
+# backups and editor leftovers
+*.bak
+*.orig
+*.~u
+*.project.~u
+
+# XAE shell
+.vs/
+*.suo
+*.user
+
+# project archives
+*.tszip
+*.tnzip
+*.tpzip
