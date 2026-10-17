@@ -5052,7 +5052,7 @@
 		</System>
 		<Plc>
 			<Project GUID="{E9145B66-1FCD-4695-AB4D-B665A29B1661}" Name="ShowPLC" PrjFilePath="ShowPLC\ShowPLC.plcproj" TmcFilePath="ShowPLC\ShowPLC.tmc" ReloadTmc="true" AmsPort="851" FileArchiveSettings="#x000e" SymbolicMapping="true">
-				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" TmcHash="{67E902C3-D9BE-E715-1D77-3FCBA9EEF51C}" TmcPath="ShowPLC\ShowPLC.tmc">
+				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" TmcHash="{72E80057-C05C-D753-6387-1C32C9C3C1E5}" TmcPath="ShowPLC\ShowPLC.tmc">
 					<Name>ShowPLC Instance</Name>
 					<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
 					<Vars VarGrpType="1">

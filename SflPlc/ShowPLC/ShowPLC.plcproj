@@ -87,6 +87,12 @@
     <Compile Include="POUs\Power\FB_SatelliteController.TcPOU">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="POUs\System\FB_ShowClock.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\System\FB_Telemetry.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="POUs\Util\F_CableFactor.TcPOU">
       <SubType>Code</SubType>
     </Compile>
@@ -117,6 +123,9 @@
     <Compile Include="POUs\Util\F_LowPass.TcPOU">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="POUs\Util\F_PadNum.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="POUs\Util\F_PowerAfterCable.TcPOU">
       <SubType>Code</SubType>
     </Compile>
@@ -129,6 +138,7 @@
     <Folder Include="GVLs" />
     <Folder Include="POUs" />
     <Folder Include="POUs\ITFs" />
+    <Folder Include="POUs\System" />
     <Folder Include="POUs\Power" />
     <Folder Include="POUs\Util" />
   </ItemGroup>

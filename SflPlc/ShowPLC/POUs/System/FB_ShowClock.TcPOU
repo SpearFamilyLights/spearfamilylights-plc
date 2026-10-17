@@ -1,0 +1,49 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="FB_ShowClock" Id="{ae20f67d-b359-476a-b79f-611bb5a5c77c}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_ShowClock
+VAR_OUTPUT
+    bValid    : BOOL;        // the clock looks set (year 2025 or later)
+    sUtcIso   : STRING(30);  // 2026-12-04T23:15:02.000Z
+    nLocalDay : UDINT;       // days since 1601-01-01 in local time
+    stUtc     : TIMESTRUCT;
+END_VAR
+VAR
+    nUtc     : T_FILETIME64;   // 100 ns ticks since 1601-01-01, UTC
+    nLastUtc : T_FILETIME64;
+    nLocal   : T_FILETIME64;
+    fbTz     : FB_FileTime64ToTzSpecificLocalTime;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[nUtc  := F_GetSystemTime();
+stUtc := FILETIME64_TO_SYSTEMTIME(nUtc);
+
+sUtcIso := F_PadNum(nValue := WORD_TO_UDINT(stUtc.wYear), nDigits := 4);
+sUtcIso := CONCAT(sUtcIso, '-');
+sUtcIso := CONCAT(sUtcIso, F_PadNum(nValue := WORD_TO_UDINT(stUtc.wMonth), nDigits := 2));
+sUtcIso := CONCAT(sUtcIso, '-');
+sUtcIso := CONCAT(sUtcIso, F_PadNum(nValue := WORD_TO_UDINT(stUtc.wDay), nDigits := 2));
+sUtcIso := CONCAT(sUtcIso, 'T');
+sUtcIso := CONCAT(sUtcIso, F_PadNum(nValue := WORD_TO_UDINT(stUtc.wHour), nDigits := 2));
+sUtcIso := CONCAT(sUtcIso, ':');
+sUtcIso := CONCAT(sUtcIso, F_PadNum(nValue := WORD_TO_UDINT(stUtc.wMinute), nDigits := 2));
+sUtcIso := CONCAT(sUtcIso, ':');
+sUtcIso := CONCAT(sUtcIso, F_PadNum(nValue := WORD_TO_UDINT(stUtc.wSecond), nDigits := 2));
+sUtcIso := CONCAT(sUtcIso, '.');
+sUtcIso := CONCAT(sUtcIso, F_PadNum(nValue := WORD_TO_UDINT(stUtc.wMilliseconds), nDigits := 3));
+sUtcIso := CONCAT(sUtcIso, 'Z');
+
+// The time-zone block expects a clock that runs on steadily. After a step (first cycle, NTP correction) it starts afresh.
+IF (nUtc < nLastUtc) OR ((nUtc - nLastUtc) > ULINT#50000000) THEN  // backwards, or more than 5 s forwards
+    fbTz.A_Reset();
+END_IF
+nLastUtc := nUtc;
+
+fbTz(in := nUtc, tzInfo := GVL_Config.stTimeZone);
+nLocal := fbTz.out;
+nLocalDay := ULINT_TO_UDINT(nLocal / ULINT#864000000000);  // 100 ns ticks per day
+
+bValid := stUtc.wYear >= 2025;]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

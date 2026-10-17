@@ -1,0 +1,284 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="FB_Telemetry" Id="{b639449c-a0f9-409b-9a83-3802a6c5d63b}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_Telemetry
+VAR_INPUT
+    bEnable        : BOOL := TRUE;
+    stCfg          : ST_MqttConfig;
+    sPassword      : STRING(63);  // empty = stay offline
+    sTimestamp     : STRING(30);  // UTC, ISO 8601
+    bSimulated     : BOOL;        // TRUE while any value comes from a simulation
+    fTotalPowerW   : LREAL;       // sum of the feeds, W
+    fTotalAmps     : LREAL;       // sum of the feeds, A
+    fEnergyTodayWh : LREAL;       // sum of the feeds, Wh
+END_VAR
+VAR_OUTPUT
+    bConnected        : BOOL;
+    hrLastError       : HRESULT;  // last error reported by the MQTT client
+    nPublishCount     : UDINT;
+    nDropCount        : UDINT;    // payload did not fit the buffer, or the client refused it
+    nLastPayloadBytes : UDINT;
+END_VAR
+VAR
+    fbMqtt : FB_IotMqttClient;
+    fbJson : FB_JsonSaxWriter;
+    sJson  : STRING(32000);       // payload buffer. Room for 64 boxes; the website drops anything above 64 KB
+
+    // Sources handed in by MAIN this cycle
+    aFeedSrc  : ARRAY[1..GVL_Param.FEED_COUNT] OF I_JsonSource;
+    aBoxSrc   : ARRAY[1..GVL_Param.BOX_COUNT] OF I_JsonSource;
+    aLoadSrc  : ARRAY[1..GVL_Param.LOAD_COUNT] OF I_JsonSource;
+    ipDiagSrc : I_JsonSource;
+    nFeedSrc  : INT;
+    nBoxSrc   : INT;
+    nLoadSrc  : INT;
+
+    sTopicOnline : STRING(255);
+    sTopicDash   : STRING(255);
+    sTopicDiag   : STRING(255);
+    sTopicHarm   : STRING(255);
+    sOnline      : STRING(1) := '1';
+    sOffline     : STRING(1) := '0';
+
+    tonDash  : TON;
+    tonDiag  : TON;
+    tonHarm  : TON;
+    bDashDue : BOOL;
+    bDiagDue : BOOL;
+    bHarmDue : BOOL;
+
+    bRun          : BOOL;
+    sPasswordSeen : STRING(63);
+    bWasConnected : BOOL;
+    bSendOnline   : BOOL;
+    i             : INT;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[// ---- topics ---------------------------------------------------------------
+sTopicOnline := CONCAT(stCfg.sTopicRoot, '/online');
+sTopicDash   := CONCAT(stCfg.sTopicRoot, '/dashboard');
+sTopicDiag   := CONCAT(stCfg.sTopicRoot, '/diag');
+sTopicHarm   := CONCAT(stCfg.sTopicRoot, '/harmonics');
+
+// ---- connection. The client reads these settings when it connects -----------
+fbMqtt.sHostName     := stCfg.sHost;
+fbMqtt.nHostPort     := stCfg.nPort;
+fbMqtt.sClientId     := stCfg.sClientId;
+fbMqtt.sUserName     := stCfg.sUser;
+fbMqtt.sUserPassword := sPassword;
+fbMqtt.sTopicPrefix  := '';
+fbMqtt.nKeepAlive    := stCfg.nKeepAliveS;
+
+// Last will: the broker publishes "0" for us if the PLC drops off the network.
+fbMqtt.stWill.sTopic       := sTopicOnline;
+fbMqtt.stWill.pPayload     := ADR(sOffline);
+fbMqtt.stWill.nPayloadSize := 1;
+fbMqtt.stWill.eQoS         := TcIotMqttQos.AtLeastOnceDelivery;
+fbMqtt.stWill.bRetain      := TRUE;
+
+// A changed password drops the connection for one cycle, so the next attempt uses the new one.
+bRun := bEnable AND stCfg.bEnable AND (LEN(sPassword) > 0) AND (sPassword = sPasswordSeen);
+sPasswordSeen := sPassword;
+fbMqtt.Execute(bRun);
+bConnected := fbMqtt.bConnected;
+IF fbMqtt.bError THEN
+    hrLastError := fbMqtt.hrErrorCode;
+END_IF
+
+// ---- "online" once per connection --------------------------------------------
+IF bConnected AND NOT bWasConnected THEN
+    bSendOnline := TRUE;
+    bDashDue    := TRUE;  // first frame right away
+    hrLastError := 0;     // connected: the errors of the attempts before are history
+END_IF
+bWasConnected := bConnected;
+
+IF bConnected AND bSendOnline THEN
+    IF fbMqtt.Publish(sTopic := sTopicOnline, pPayload := ADR(sOnline), nPayloadSize := 1,
+                      eQoS := TcIotMqttQos.AtLeastOnceDelivery, bRetain := TRUE, bQueue := FALSE) THEN
+        bSendOnline := FALSE;
+    END_IF
+END_IF
+
+// ---- timers ---------------------------------------------------------------------
+tonDash(IN := bConnected AND NOT tonDash.Q, PT := stCfg.tDashboard);
+IF tonDash.Q THEN
+    bDashDue := TRUE;
+END_IF
+tonDiag(IN := bConnected AND NOT tonDiag.Q, PT := stCfg.tDiag);
+IF tonDiag.Q THEN
+    bDiagDue := TRUE;
+END_IF
+tonHarm(IN := bConnected AND NOT tonHarm.Q, PT := stCfg.tHarmonics);
+IF tonHarm.Q THEN
+    bHarmDue := TRUE;
+END_IF
+IF NOT bConnected THEN
+    bDashDue := FALSE;
+    bDiagDue := FALSE;
+    bHarmDue := FALSE;
+END_IF
+
+// ---- one payload per cycle at most ------------------------------------------------
+IF bDashDue THEN
+    bDashDue := FALSE;
+
+    fbJson.ResetDocument();
+    fbJson.SetMaxDecimalPlaces(3);
+    fbJson.StartObject();
+    F_JsonInt(sKey := 'v', nValue := 2, fbJson := fbJson);
+    fbJson.AddKey('ts');
+    fbJson.AddString(sTimestamp);
+    fbJson.AddKey('sim');
+    fbJson.AddBool(bSimulated);
+    // The three totals are required numbers in the website's original schema.
+    F_JsonNum(sKey := 'powerW',        fValue := fTotalPowerW,   bValid := TRUE, nDecimals := 1, fbJson := fbJson);
+    F_JsonNum(sKey := 'energyTodayWh', fValue := fEnergyTodayWh, bValid := TRUE, nDecimals := 0, fbJson := fbJson);
+    F_JsonNum(sKey := 'totalAmps',     fValue := fTotalAmps,     bValid := TRUE, nDecimals := 2, fbJson := fbJson);
+
+    fbJson.AddKey('circuits');
+    fbJson.StartArray();
+    FOR i := 1 TO nFeedSrc DO
+        fbJson.StartObject();
+        aFeedSrc[i].WriteJson(eSection := E_JsonSection.Circuit, fbJson := fbJson);
+        fbJson.EndObject();
+    END_FOR
+    fbJson.EndArray();
+
+    fbJson.AddKey('feeds');
+    fbJson.StartArray();
+    FOR i := 1 TO nFeedSrc DO
+        fbJson.StartObject();
+        aFeedSrc[i].WriteJson(eSection := E_JsonSection.Feed, fbJson := fbJson);
+        fbJson.EndObject();
+    END_FOR
+    fbJson.EndArray();
+
+    fbJson.AddKey('boxes');
+    fbJson.StartArray();
+    FOR i := 1 TO nBoxSrc DO
+        fbJson.StartObject();
+        aBoxSrc[i].WriteJson(eSection := E_JsonSection.Box, fbJson := fbJson);
+        fbJson.EndObject();
+    END_FOR
+    fbJson.EndArray();
+
+    fbJson.AddKey('loads');
+    fbJson.StartArray();
+    FOR i := 1 TO nLoadSrc DO
+        fbJson.StartObject();
+        aLoadSrc[i].WriteJson(eSection := E_JsonSection.Load, fbJson := fbJson);
+        fbJson.EndObject();
+    END_FOR
+    fbJson.EndArray();
+
+    fbJson.EndObject();
+    Send(sTopic := sTopicDash);
+
+ELSIF bDiagDue THEN
+    bDiagDue := FALSE;
+
+    IF ipDiagSrc <> 0 THEN
+        fbJson.ResetDocument();
+        fbJson.SetMaxDecimalPlaces(3);
+        fbJson.StartObject();
+        ipDiagSrc.WriteJson(eSection := E_JsonSection.Diag, fbJson := fbJson);
+        fbJson.EndObject();
+        Send(sTopic := sTopicDiag);
+    END_IF
+
+ELSIF bHarmDue THEN
+    bHarmDue := FALSE;
+
+    IF nFeedSrc > 0 THEN
+        fbJson.ResetDocument();
+        fbJson.SetMaxDecimalPlaces(3);
+        fbJson.StartObject();
+        fbJson.AddKey('ts');
+        fbJson.AddString(sTimestamp);
+        fbJson.AddKey('feeds');
+        fbJson.StartArray();
+        FOR i := 1 TO nFeedSrc DO
+            fbJson.StartObject();
+            aFeedSrc[i].WriteJson(eSection := E_JsonSection.Harmonics, fbJson := fbJson);
+            fbJson.EndObject();
+        END_FOR
+        fbJson.EndArray();
+        fbJson.EndObject();
+        Send(sTopic := sTopicHarm);
+    END_IF
+END_IF
+
+// ---- MAIN hands the sources in again next cycle -------------------------------------
+nFeedSrc  := 0;
+nBoxSrc   := 0;
+nLoadSrc  := 0;
+ipDiagSrc := 0;]]></ST>
+    </Implementation>
+    <Method Name="AddSource" Id="{45491f0f-d3f8-46d8-885f-01dbc515638d}">
+      <Declaration><![CDATA[// Call every cycle, before the block itself, once per object that should appear in the payloads.
+METHOD AddSource : BOOL
+VAR_INPUT
+    eSection : E_JsonSection;  // Feed, Box, Load or Diag
+    ipSource : I_JsonSource;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[AddSource := FALSE;
+IF ipSource = 0 THEN
+    RETURN;
+END_IF
+
+CASE eSection OF
+    E_JsonSection.Feed:
+        IF nFeedSrc < GVL_Param.FEED_COUNT THEN
+            nFeedSrc := nFeedSrc + 1;
+            aFeedSrc[nFeedSrc] := ipSource;
+            AddSource := TRUE;
+        END_IF
+    E_JsonSection.Box:
+        IF nBoxSrc < GVL_Param.BOX_COUNT THEN
+            nBoxSrc := nBoxSrc + 1;
+            aBoxSrc[nBoxSrc] := ipSource;
+            AddSource := TRUE;
+        END_IF
+    E_JsonSection.Load:
+        IF nLoadSrc < GVL_Param.LOAD_COUNT THEN
+            nLoadSrc := nLoadSrc + 1;
+            aLoadSrc[nLoadSrc] := ipSource;
+            AddSource := TRUE;
+        END_IF
+    E_JsonSection.Diag:
+        ipDiagSrc := ipSource;
+        AddSource := TRUE;
+END_CASE]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Send" Id="{37df8b0f-0f7a-48b8-86b4-8047f60188ee}">
+      <Declaration><![CDATA[// Publishes the document the JSON writer holds. QoS 1, retained, no trailing zero byte.
+METHOD PRIVATE Send : BOOL
+VAR_INPUT
+    sTopic : STRING(255);
+END_VAR
+VAR
+    nLen  : UDINT;
+    bSent : BOOL;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[bSent := FALSE;
+nLen := fbJson.CopyDocument(sJson, SIZEOF(sJson));  // length including the terminating zero; 0 = did not fit
+IF nLen > 1 THEN
+    nLastPayloadBytes := nLen - 1;
+    bSent := fbMqtt.Publish(sTopic := sTopic, pPayload := ADR(sJson), nPayloadSize := nLen - 1,
+                            eQoS := TcIotMqttQos.AtLeastOnceDelivery, bRetain := TRUE, bQueue := FALSE);
+END_IF
+
+IF bSent THEN
+    nPublishCount := nPublishCount + 1;
+ELSE
+    nDropCount := nDropCount + 1;
+END_IF
+Send := bSent;]]></ST>
+      </Implementation>
+    </Method>
+  </POU>
+</TcPlcObject>

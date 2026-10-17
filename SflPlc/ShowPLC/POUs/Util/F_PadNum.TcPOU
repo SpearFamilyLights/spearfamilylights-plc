@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="F_PadNum" Id="{bc32951d-4de2-4d2f-a4f8-c6a084d69399}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION F_PadNum : STRING(10)
+VAR_INPUT
+    nValue  : UDINT;
+    nDigits : INT;  // 1..10
+END_VAR
+VAR
+    sText : STRING(10);
+	vsText: STRING;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[sText := UDINT_TO_STRING(nValue);
+WHILE (LEN(sText) < nDigits) AND (LEN(sText) < 10) DO
+    sText := CONCAT('0', sText);
+END_WHILE
+F_PadNum := sText;]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>
