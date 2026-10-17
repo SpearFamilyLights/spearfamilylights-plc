@@ -11,29 +11,39 @@ VAR_GLOBAL
     fFilterTimeS      : LREAL := 1.0;   // low-pass on feed and supply values before the split, seconds
     fVoltsPresentMin  : LREAL := 90.0;  // V per leg. Above this a feed counts as "on"
 
+    // ---- cables ---------------------------------------------------------------
+    // Every feed, box and load has a one-way cable length and an AWG. The loss in each cable is I^2 R
+    // with that component's own current. Lengths below are placeholders until measured.
+    fWireTempC          : LREAL := 20.0;   // conductor temperature for the resistance. Copper: +0.39 % per degree C
+    fWireFactor         : LREAL := 1.0;    // 1.0 solid copper, about 1.03 stranded copper, about 1.6 aluminium
+    fNominalAcVolts     : LREAL := 240.0;  // L1 to L2 at the loads. With the power factor it turns a load's power into the current in its cable
+    fNominalPowerFactor : LREAL := 1.0;    // of the boxes and loads. Current = power / (volts * power factor)
+
     // ---- feeds ----------------------------------------------------------------
     aFeeds : ARRAY[1..GVL_Param.FEED_COUNT] OF ST_FeedConfig := [
-        (sId := 'F1', sName := 'Feed 1', fMaxAmps := 32.0, fInfeedLengthFt := 100.0, fInfeedOhmPerKft := 1.0),
-        (sId := 'F2', sName := 'Feed 2', fMaxAmps := 32.0, fInfeedLengthFt := 100.0, fInfeedOhmPerKft := 1.0)];
+        (sId := 'F1', sName := 'Feed 1', fMaxAmps := 32.0, fWireLengthFt := 100.0, nWireAwg := 10),
+        (sId := 'F2', sName := 'Feed 2', fMaxAmps := 32.0, fWireLengthFt := 100.0, nWireAwg := 10)];
 
     // ---- satellite controller boxes ---------------------------------------------
     // sControllerName must match the website's label exactly. sId is its slug.
+    // A box without an EtherCAT supply is estimated from its feed. Its DC amps use fNominalDcVolts (24 V unless set here).
     aBoxes : ARRAY[1..GVL_Param.BOX_COUNT] OF ST_BoxConfig := [
-        (sId := 'porch',        sControllerName := 'Porch',        nFeedId := 1, bHasEcPowerSupply := FALSE,  nPixelCount := 16325, fMaxDcCurrent := 80.0),
-        (sId := 'metal-roof',   sControllerName := 'Metal Roof',   nFeedId := 2, bHasEcPowerSupply := FALSE,  nPixelCount := 12820, fMaxDcCurrent := 80.0),
-        (sId := 'center-gable', sControllerName := 'Center Gable', nFeedId := 1, bHasEcPowerSupply := TRUE, nPixelCount := 2841,  fMaxDcCurrent := 20.0),
-        (sId := 'courtyard',    sControllerName := 'Courtyard',    nFeedId := 1, bHasEcPowerSupply := TRUE, nPixelCount := 452,   fMaxDcCurrent := 20.0),
-        (sId := 'lawn-s-1',     sControllerName := 'Lawn S-1',     nFeedId := 1, bHasEcPowerSupply := TRUE, nPixelCount := 1500,  fMaxDcCurrent := 20.0),
-        (sId := 'lawn-s-2',     sControllerName := 'Lawn S-2',     nFeedId := 1, bHasEcPowerSupply := TRUE, nPixelCount := 2541,  fMaxDcCurrent := 20.0),
-        (sId := 'lawn-s-3',     sControllerName := 'Lawn S-3',     nFeedId := 2, bHasEcPowerSupply := TRUE,  nPixelCount := 6141,  fMaxDcCurrent := 20.0),
-        (sId := 'lawn-n-1',     sControllerName := 'Lawn N-1',     nFeedId := 2, bHasEcPowerSupply := TRUE, nPixelCount := 2450,  fMaxDcCurrent := 20.0),
-        (sId := 'lawn-n-2',     sControllerName := 'Lawn N-2',     nFeedId := 2, bHasEcPowerSupply := TRUE, nPixelCount := 4115,  fMaxDcCurrent := 20.0)];
+        (sId := 'porch',        sControllerName := 'Porch',        nFeedId := 1, bHasEcPowerSupply := FALSE, nPixelCount := 16325, fMaxDcCurrent := 80.0, fWireLengthFt := 50.0, nWireAwg := 12),
+        (sId := 'metal-roof',   sControllerName := 'Metal Roof',   nFeedId := 2, bHasEcPowerSupply := FALSE, nPixelCount := 12820, fMaxDcCurrent := 80.0, fWireLengthFt := 50.0, nWireAwg := 12),
+        (sId := 'center-gable', sControllerName := 'Center Gable', nFeedId := 1, bHasEcPowerSupply := TRUE,  nPixelCount := 2841,  fMaxDcCurrent := 20.0, fWireLengthFt := 50.0, nWireAwg := 12),
+        (sId := 'courtyard',    sControllerName := 'Courtyard',    nFeedId := 1, bHasEcPowerSupply := TRUE,  nPixelCount := 452,   fMaxDcCurrent := 20.0, fWireLengthFt := 50.0, nWireAwg := 12),
+        (sId := 'lawn-s-1',     sControllerName := 'Lawn S-1',     nFeedId := 1, bHasEcPowerSupply := TRUE,  nPixelCount := 1500,  fMaxDcCurrent := 20.0, fWireLengthFt := 50.0, nWireAwg := 12),
+        (sId := 'lawn-s-2',     sControllerName := 'Lawn S-2',     nFeedId := 1, bHasEcPowerSupply := TRUE,  nPixelCount := 2541,  fMaxDcCurrent := 20.0, fWireLengthFt := 50.0, nWireAwg := 12),
+        (sId := 'lawn-s-3',     sControllerName := 'Lawn S-3',     nFeedId := 2, bHasEcPowerSupply := TRUE,  nPixelCount := 6141,  fMaxDcCurrent := 20.0, fWireLengthFt := 50.0, nWireAwg := 12),
+        (sId := 'lawn-n-1',     sControllerName := 'Lawn N-1',     nFeedId := 2, bHasEcPowerSupply := TRUE,  nPixelCount := 2450,  fMaxDcCurrent := 20.0, fWireLengthFt := 50.0, nWireAwg := 12),
+        (sId := 'lawn-n-2',     sControllerName := 'Lawn N-2',     nFeedId := 2, bHasEcPowerSupply := TRUE,  nPixelCount := 4115,  fMaxDcCurrent := 20.0, fWireLengthFt := 50.0, nWireAwg := 12)];
 
     // ---- generic loads ------------------------------------------------------------
+    // One row per GVL_Param.LOAD_COUNT.
     aLoads : ARRAY[1..GVL_Param.LOAD_COUNT] OF ST_GenericLoadConfig := [
-        (sId := 'L1', sName := 'Metal Roof Floods', nFeedId := 2, fRatedPowerW := 20.0, bEnabled := TRUE),
-        (sId := 'L2', sName := 'North Peak Floods', nFeedId := 2, fRatedPowerW := 20.0, bEnabled := TRUE),
-		(sId := 'L3', sName := 'South Peak Floods', nFeedId := 2, fRatedPowerW := 20.0, bEnabled := TRUE)];
+        (sId := 'L1', sName := 'Metal Roof Floods', nFeedId := 2, fRatedPowerW := 20.0, bEnabled := TRUE, fWireLengthFt := 50.0, nWireAwg := 14),
+        (sId := 'L2', sName := 'North Peak Floods', nFeedId := 2, fRatedPowerW := 20.0, bEnabled := TRUE, fWireLengthFt := 50.0, nWireAwg := 14),
+        (sId := 'L3', sName := 'South Peak Floods', nFeedId := 2, fRatedPowerW := 20.0, bEnabled := TRUE, fWireLengthFt := 50.0, nWireAwg := 14)];
 
     // ---- EtherCAT power supplies (PS2001) -------------------------------------------
     // Info data scaling is not documented. 0.0 keeps the value out of the payload until it is checked in step 5.
@@ -41,7 +51,7 @@ VAR_GLOBAL
     fPsuInfo2Scale : LREAL := 0.0;      // volts per count of "Info data 2" (RMS input voltage)
 
     // ---- TF8330 -----------------------------------------------------------------------
-    nTf8330FundamentalIndex : INT := 0; // element of aHarm1 that holds the fundamental (reads 100). -1 if the arrays start at the 2nd harmonic. Check in step 4
+    nTf8330FundamentalIndex : INT := 1; // element of aHarm1 that reads 100 (the fundamental): 1 if element 0 is the DC part, 0 if the arrays start at the fundamental, -1 if they start at the 2nd harmonic. Check in step 4
 
     // ---- MQTT ---------------------------------------------------------------------------
     stMqtt : ST_MqttConfig;             // defaults are in the type

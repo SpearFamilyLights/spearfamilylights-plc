@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="F_CableFactor" Id="{0f24954a-476d-4214-bfcf-441ed17365d0}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION F_CableFactor : LREAL
+VAR_INPUT
+    fLengthFt : LREAL;  // one-way length of the cable
+    nAwg      : INT;
+END_VAR
+VAR
+    fVoltsEff : LREAL;  // V * PF
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[fVoltsEff := GVL_Config.fNominalAcVolts * LIMIT(0.5, GVL_Config.fNominalPowerFactor, 1.0);
+IF fVoltsEff > 1.0 THEN
+    F_CableFactor := 2.0 * F_WireOhms(fLengthFt := fLengthFt, nAwg := nAwg) / (fVoltsEff * fVoltsEff);
+ELSE
+    F_CableFactor := 0.0;
+END_IF]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

@@ -5,7 +5,7 @@
 VAR_INPUT
     bOnline      : BOOL := TRUE;    // FALSE simulates a dead meter
     fVoltsLeg    : LREAL := 120.0;  // V, each leg to ground
-    fPowerW      : LREAL := 400.0;  // W, total active power of the feed
+    fPowerW      : LREAL := 1500.0; // W, total active power of the feed
     fPowerFactor : LREAL := 0.98;
     fResidualA   : LREAL := 0.0;    // A
     fThdVoltsPct : LREAL := 2.0;

@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="F_WireOhms" Id="{ea8df812-eac2-4fee-93fc-6cd2ec4abff8}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION F_WireOhms : LREAL
+VAR_INPUT
+    fLengthFt : LREAL;  // one-way length of the run
+    nAwg      : INT;    // AWG of one conductor. 0 = 1/0, -1 = 2/0, -2 = 3/0, -3 = 4/0
+END_VAR
+VAR
+    fAwg       : LREAL;
+    fCmil      : LREAL;  // cross-section in circular mils
+    fOhmPerKft : LREAL;
+    fTempC     : LREAL;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[fAwg       := INT_TO_LREAL(LIMIT(-3, nAwg, 30));                          // 4/0 to 30 AWG. Anything else is a typo
+fTempC     := LIMIT(-60.0, GVL_Config.fWireTempC, 150.0);
+fCmil      := 25.0 * EXPT(92.0, (36.0 - fAwg) * 2.0 / 39.0);
+fOhmPerKft := 10371.0 / fCmil * (1.0 + 0.00393 * (fTempC - 20.0)) * MAX(0.1, GVL_Config.fWireFactor);
+F_WireOhms := MAX(0.0, fLengthFt) * fOhmPerKft / 1000.0;]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

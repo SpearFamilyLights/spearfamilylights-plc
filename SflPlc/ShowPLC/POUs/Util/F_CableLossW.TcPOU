@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="F_CableLossW" Id="{1877e3bc-ff46-4181-b7a3-cf839258cdf5}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION F_CableLossW : LREAL
+VAR_INPUT
+    fPowerW   : LREAL;  // W at the load's terminals
+    fLengthFt : LREAL;  // one-way length of its cable
+    nAwg      : INT;
+END_VAR
+VAR
+    fP : LREAL;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[fP := MAX(0.0, fPowerW);
+F_CableLossW := F_CableFactor(fLengthFt := fLengthFt, nAwg := nAwg) * fP * fP;]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

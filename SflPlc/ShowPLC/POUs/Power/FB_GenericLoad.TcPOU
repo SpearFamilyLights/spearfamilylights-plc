@@ -6,14 +6,16 @@ VAR_INPUT
     stCfg : ST_GenericLoadConfig;  // this load's row of GVL_Config.aLoads
 END_VAR
 VAR_OUTPUT
-    fAcPowerW : LREAL;  // W counted against the feed
+    fAcPowerW   : LREAL;  // W at the load
+    fCableLossW : LREAL;  // W lost in the load's cable, on top of fAcPowerW
 END_VAR]]></Declaration>
     <Implementation>
       <ST><![CDATA[IF stCfg.bEnabled THEN
     fAcPowerW := MAX(0.0, stCfg.fRatedPowerW);
 ELSE
     fAcPowerW := 0.0;
-END_IF]]></ST>
+END_IF
+fCableLossW := F_CableLossW(fPowerW := fAcPowerW, fLengthFt := stCfg.fWireLengthFt, nAwg := stCfg.nWireAwg);]]></ST>
     </Implementation>
     <Method Name="GetDemand" Id="{ee1d4dfe-af16-4a50-a7cc-63aad0f8d55b}">
       <Declaration><![CDATA[METHOD GetDemand : ST_LoadDemand
@@ -21,10 +23,12 @@ VAR
     stDemand : ST_LoadDemand;
 END_VAR]]></Declaration>
       <Implementation>
-        <ST><![CDATA[stDemand.eKind     := E_LoadKind.Rated;
-stDemand.fAcPowerW := fAcPowerW;
-stDemand.fWeight   := 0.0;
-stDemand.bValid    := TRUE;
+        <ST><![CDATA[stDemand.eKind        := E_LoadKind.Rated;
+stDemand.fAcPowerW    := fAcPowerW + fCableLossW;
+stDemand.fCableLossW  := fCableLossW;
+stDemand.fWeight      := 0.0;
+stDemand.fCableFactor := F_CableFactor(fLengthFt := stCfg.fWireLengthFt, nAwg := stCfg.nWireAwg);
+stDemand.bValid       := TRUE;
 GetDemand := stDemand;]]></ST>
       </Implementation>
     </Method>
@@ -65,7 +69,8 @@ fbJson.AddKey('feed');
 fbJson.AddString(sFeed);
 F_JsonNum(sKey := 'ratedW', fValue := stCfg.fRatedPowerW, bValid := TRUE, nDecimals := 0, fbJson := fbJson);
 fbJson.AddKey('on');
-fbJson.AddBool(stCfg.bEnabled);]]></ST>
+fbJson.AddBool(stCfg.bEnabled);
+F_JsonNum(sKey := 'cableLossW', fValue := fCableLossW, bValid := TRUE, nDecimals := 1, fbJson := fbJson);]]></ST>
       </Implementation>
     </Method>
   </POU>

@@ -15,10 +15,11 @@ VAR_OUTPUT
     stMeas         : ST_AcMeasurement;  // filtered measurement
     fAmps          : LREAL;             // A, the larger leg
     fCableLossW    : LREAL;             // W lost in the infeed cable
-    fLoadPowerW    : LREAL;             // W at the loads: meter minus cable loss
-    fMeasuredW     : LREAL;             // W drawn by boxes with a supply
-    fRatedW        : LREAL;             // W of enabled generic loads
-    fUnmeteredW    : LREAL;             // W split across boxes without a supply
+    fLoadPowerW    : LREAL;             // W at the branch point: meter minus infeed cable loss
+    fMeasuredW     : LREAL;             // W taken by boxes with a supply, their cable losses included
+    fRatedW        : LREAL;             // W taken by enabled generic loads, their cable losses included
+    fUnmeteredW    : LREAL;             // W split across boxes without a supply, their cable losses included
+    fDropLossW     : LREAL;             // W lost in the loads' own cables, as the loads report it
     fUnaccountedW  : LREAL;             // W left over. Not zero means the model is off
     fEnergyTodayWh : LREAL;             // copy of the counter for telemetry
     nLoadCount     : INT;               // loads registered this cycle
@@ -30,6 +31,7 @@ VAR
     fCycleS   : LREAL;
     fTau      : LREAL;
     fOhms     : LREAL;
+    fRawLossW : LREAL;  // infeed loss from this cycle's unfiltered currents
 END_VAR]]></Declaration>
     <Implementation>
       <ST><![CDATA[fCycleS := F_CycleTimeS();
@@ -41,7 +43,13 @@ IF ipMeter <> 0 THEN
     bMeterOk := ipMeter.Read(stMeas := stRaw);
 END_IF
 
-// 2. Filter what the power balance uses. Everything else is passed through.
+// 2. Infeed cable loss from the raw leg currents. The ground conductor carries no load current, so two conductors count.
+//    The loss goes with the square of the current, so it is computed before the filter and filtered on its own:
+//    squaring a filtered current would read low whenever the load moves.
+fOhms     := F_WireOhms(fLengthFt := stCfg.fWireLengthFt, nAwg := stCfg.nWireAwg);
+fRawLossW := fOhms * (stRaw.fAmpsL1 * stRaw.fAmpsL1 + stRaw.fAmpsL2 * stRaw.fAmpsL2);
+
+// 3. Filter what the power balance uses. Everything else is passed through.
 IF bMeterOk THEN
     IF bValid THEN
         stRaw.fAmpsL1       := F_LowPass(fState := stMeas.fAmpsL1,       fInput := stRaw.fAmpsL1,       fTimeS := fTau, fCycleS := fCycleS);
@@ -49,16 +57,16 @@ IF bMeterOk THEN
         stRaw.fAmpsResidual := F_LowPass(fState := stMeas.fAmpsResidual, fInput := stRaw.fAmpsResidual, fTimeS := fTau, fCycleS := fCycleS);
         stRaw.fPowerW       := F_LowPass(fState := stMeas.fPowerW,       fInput := stRaw.fPowerW,       fTimeS := fTau, fCycleS := fCycleS);
         stRaw.fApparentVA   := F_LowPass(fState := stMeas.fApparentVA,   fInput := stRaw.fApparentVA,   fTimeS := fTau, fCycleS := fCycleS);
+        fCableLossW         := F_LowPass(fState := fCableLossW,          fInput := fRawLossW,           fTimeS := fTau, fCycleS := fCycleS);
+    ELSE
+        fCableLossW := fRawLossW;
     END_IF
     stMeas := stRaw;  // on the first valid sample this is the raw value: no filter run-in
 END_IF
 bValid := bMeterOk;
 stMeas.bValid := bMeterOk;
 
-// 3. Cable loss. The ground conductor carries no load current, so two conductors count.
 fAmps := MAX(stMeas.fAmpsL1, stMeas.fAmpsL2);
-fOhms := MAX(0.0, stCfg.fInfeedLengthFt) * MAX(0.0, stCfg.fInfeedOhmPerKft) / 1000.0;
-fCableLossW := fOhms * (stMeas.fAmpsL1 * stMeas.fAmpsL1 + stMeas.fAmpsL2 * stMeas.fAmpsL2);
 fLoadPowerW := MAX(0.0, stMeas.fPowerW - fCableLossW);
 
 // 4. Energy since local midnight. TF8330 has no energy counters, so it is integrated here.
@@ -91,30 +99,38 @@ METHOD Allocate
 VAR
     i          : INT;
     stDemand   : ST_LoadDemand;
-    fWeightSum : LREAL;
-    fRest      : LREAL;
+    fWeightSum : LREAL;  // sum of the pixel counts of the estimated boxes
+    fFactorSum : LREAL;  // sum of (cable factor * pixel count^2) over them
+    fRest      : LREAL;  // W left for them, at the branch point
+    fPerPixel  : LREAL;  // W per pixel at the boxes
+    fAtBox     : LREAL;
     fShare     : LREAL;
 END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[fMeasuredW := 0.0;
 fRatedW    := 0.0;
+fDropLossW := 0.0;
 fWeightSum := 0.0;
+fFactorSum := 0.0;
 bDegraded  := FALSE;
 
-// Pass 1: add up what is known
+// Pass 1: add up what is known. Every demand is at the branch point, cable loss included.
 FOR i := 1 TO nLoadCount DO
     stDemand := aLoads[i].GetDemand();
     CASE stDemand.eKind OF
         E_LoadKind.Measured:
             IF stDemand.bValid THEN
                 fMeasuredW := fMeasuredW + MAX(0.0, stDemand.fAcPowerW);
+                fDropLossW := fDropLossW + MAX(0.0, stDemand.fCableLossW);
             ELSE
                 bDegraded := TRUE;
             END_IF
         E_LoadKind.Rated:
-            fRatedW := fRatedW + MAX(0.0, stDemand.fAcPowerW);
+            fRatedW    := fRatedW + MAX(0.0, stDemand.fAcPowerW);
+            fDropLossW := fDropLossW + MAX(0.0, stDemand.fCableLossW);
         E_LoadKind.Estimated:
             fWeightSum := fWeightSum + MAX(0.0, stDemand.fWeight);
+            fFactorSum := fFactorSum + MAX(0.0, stDemand.fCableFactor) * stDemand.fWeight * stDemand.fWeight;
     END_CASE
 END_FOR
 
@@ -127,16 +143,23 @@ ELSE
 END_IF
 fUnaccountedW := fLoadPowerW - fMeasuredW - fRatedW - fUnmeteredW;
 
-// Pass 2: hand out the shares by weight
+// The split is proportional to pixels AT THE BOXES: box i gets fPerPixel * pixels at its terminals and takes
+// that plus its own cable loss, a_i * (fPerPixel * pixels)^2, at the branch point. The sum over the boxes
+// equals fRest, which gives fPerPixel from a quadratic: fFactorSum * k^2 + fWeightSum * k = fRest.
+fPerPixel := 0.0;
+IF fWeightSum > 0.0 THEN
+    fPerPixel := 2.0 * fRest / (fWeightSum + SQRT(fWeightSum * fWeightSum + 4.0 * fFactorSum * fRest));
+END_IF
+
+// Pass 2: hand out the shares at the branch point; each box recovers its own power from its share.
 FOR i := 1 TO nLoadCount DO
     stDemand := aLoads[i].GetDemand();
     IF stDemand.eKind = E_LoadKind.Estimated THEN
-        IF fWeightSum > 0.0 THEN
-            fShare := fRest * MAX(0.0, stDemand.fWeight) / fWeightSum;
-        ELSE
-            fShare := 0.0;
-        END_IF
+        fAtBox := fPerPixel * MAX(0.0, stDemand.fWeight);
+        fShare := fAtBox + MAX(0.0, stDemand.fCableFactor) * fAtBox * fAtBox;
         aLoads[i].SetShare(fShareW := fShare, bShareValid := bValid);
+        stDemand   := aLoads[i].GetDemand();  // now carries this cycle's cable loss
+        fDropLossW := fDropLossW + MAX(0.0, stDemand.fCableLossW);
     END_IF
 END_FOR]]></ST>
       </Implementation>
@@ -195,6 +218,7 @@ END_VAR]]></Declaration>
         F_JsonNum(sKey := 'thdAmpsL1',     fValue := stMeas.fThdAmpsL1,      bValid := bThdOk, nDecimals := 1, fbJson := fbJson);
         F_JsonNum(sKey := 'thdAmpsL2',     fValue := stMeas.fThdAmpsL2,      bValid := bThdOk, nDecimals := 1, fbJson := fbJson);
         F_JsonNum(sKey := 'cableLossW',    fValue := fCableLossW,            bValid := bValid, nDecimals := 1, fbJson := fbJson);
+        F_JsonNum(sKey := 'dropLossW',     fValue := fDropLossW,             bValid := bValid, nDecimals := 1, fbJson := fbJson);
         F_JsonNum(sKey := 'measuredW',     fValue := fMeasuredW,             bValid := bValid, nDecimals := 1, fbJson := fbJson);
         F_JsonNum(sKey := 'ratedW',        fValue := fRatedW,                bValid := TRUE,   nDecimals := 1, fbJson := fbJson);
         F_JsonNum(sKey := 'unmeteredW',    fValue := fUnmeteredW,            bValid := bValid, nDecimals := 1, fbJson := fbJson);

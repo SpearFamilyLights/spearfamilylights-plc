@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="F_PowerAfterCable" Id="{ff26a601-f043-4807-9146-864c64a1b6e0}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION F_PowerAfterCable : LREAL
+VAR_INPUT
+    fShareW   : LREAL;  // W at the branch point
+    fLengthFt : LREAL;  // one-way length of the cable
+    nAwg      : INT;
+END_VAR
+VAR
+    fA     : LREAL;
+    fShare : LREAL;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[fShare := MAX(0.0, fShareW);
+fA     := F_CableFactor(fLengthFt := fLengthFt, nAwg := nAwg);
+F_PowerAfterCable := 2.0 * fShare / (1.0 + SQRT(1.0 + 4.0 * fA * fShare));]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

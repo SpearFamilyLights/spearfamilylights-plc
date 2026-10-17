@@ -1,44 +1,54 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1">
-  <POU Name="FB_SateliteController" Id="{fd4bea5b-c411-438a-8000-f3f90d5fc734}" SpecialFunc="None">
-    <Declaration><![CDATA[FUNCTION_BLOCK FB_SateliteController IMPLEMENTS I_FeedLoad, I_JsonSource
+  <POU Name="FB_SatelliteController" Id="{fd4bea5b-c411-438a-8000-f3f90d5fc734}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_SatelliteController IMPLEMENTS I_FeedLoad, I_JsonSource
 VAR_INPUT
     stCfg : ST_BoxConfig;  // this box's row of GVL_Config.aBoxes
 END_VAR
 VAR_OUTPUT
-    bValid    : BOOL;   // the values below can be used
-    bMeasured : BOOL;   // TRUE: from the supply. FALSE: estimated from the feed
-    fDcAmps   : LREAL;  // A DC, filtered
-    fDcVolts  : LREAL;  // V DC
-    fAcPowerW : LREAL;  // W on the AC side
+    bValid      : BOOL;   // the values below can be used
+    bMeasured   : BOOL;   // TRUE: from the supply. FALSE: estimated from the feed
+    fDcAmps     : LREAL;  // A DC, filtered
+    fDcVolts    : LREAL;  // V DC
+    fAcPowerW   : LREAL;  // W on the AC side, at the box
+    fCableLossW : LREAL;  // W lost in the box's own AC cable, on top of fAcPowerW
 END_VAR
 VAR
-    fbSupply : FB_EcPowerSupply;
-    fEff     : LREAL := 0.95;
+    fbSupply  : FB_EcPowerSupply;
+    fEff      : LREAL := 0.95;
+    fCycleS   : LREAL;
+    fRawLossW : LREAL;  // cable loss from this cycle's unfiltered current
 END_VAR]]></Declaration>
     <Implementation>
-      <ST><![CDATA[fEff := LIMIT(0.5, stCfg.fPsuEfficiency, 1.0);
+      <ST><![CDATA[fEff    := LIMIT(0.5, stCfg.fPsuEfficiency, 1.0);
+fCycleS := F_CycleTimeS();
 
 IF stCfg.bHasEcPowerSupply THEN
     bMeasured := TRUE;
     fbSupply(bSimulate := GVL_Config.bSimulateSupplies);
 
     IF fbSupply.bOnline THEN
-        IF bValid THEN
-            fDcAmps := F_LowPass(fState := fDcAmps, fInput := fbSupply.fOutputAmps,
-                                 fTimeS := GVL_Config.fFilterTimeS, fCycleS := F_CycleTimeS());
-        ELSE
-            fDcAmps := fbSupply.fOutputAmps;  // first valid sample: no filter run-in
-        END_IF
         fDcVolts  := fbSupply.fOutputVolts;
+        // The loss goes with the square of the current, so it is taken from the raw current every cycle and
+        // filtered afterwards. Filtering the current first would read low whenever the load moves.
+        fRawLossW := F_CableLossW(fPowerW := fDcVolts * fbSupply.fOutputAmps / fEff,
+                                  fLengthFt := stCfg.fWireLengthFt, nAwg := stCfg.nWireAwg);
+        IF bValid THEN
+            fDcAmps     := F_LowPass(fState := fDcAmps,     fInput := fbSupply.fOutputAmps, fTimeS := GVL_Config.fFilterTimeS, fCycleS := fCycleS);
+            fCableLossW := F_LowPass(fState := fCableLossW, fInput := fRawLossW,            fTimeS := GVL_Config.fFilterTimeS, fCycleS := fCycleS);
+        ELSE
+            fDcAmps     := fbSupply.fOutputAmps;  // first valid sample: no filter run-in
+            fCableLossW := fRawLossW;
+        END_IF
         fAcPowerW := fDcVolts * fDcAmps / fEff;
         bValid    := TRUE;
     ELSE
         // Off the bus: counted as 0 W and reported as not valid.
-        fDcAmps   := 0.0;
-        fDcVolts  := 0.0;
-        fAcPowerW := 0.0;
-        bValid    := FALSE;
+        fDcAmps     := 0.0;
+        fDcVolts    := 0.0;
+        fAcPowerW   := 0.0;
+        fCableLossW := 0.0;
+        bValid      := FALSE;
     END_IF
 ELSE
     // No supply: SetShare() writes the outputs when the feed has done its split.
@@ -51,16 +61,20 @@ VAR
     stDemand : ST_LoadDemand;
 END_VAR]]></Declaration>
       <Implementation>
-        <ST><![CDATA[IF stCfg.bHasEcPowerSupply THEN
-    stDemand.eKind     := E_LoadKind.Measured;
-    stDemand.fAcPowerW := fAcPowerW;
-    stDemand.fWeight   := 0.0;
-    stDemand.bValid    := bValid;
+        <ST><![CDATA[// What the feed sees at the branch point: the box's draw plus the loss in the box's cable.
+stDemand.fCableFactor := F_CableFactor(fLengthFt := stCfg.fWireLengthFt, nAwg := stCfg.nWireAwg);
+IF stCfg.bHasEcPowerSupply THEN
+    stDemand.eKind       := E_LoadKind.Measured;
+    stDemand.fAcPowerW   := fAcPowerW + fCableLossW;
+    stDemand.fCableLossW := fCableLossW;
+    stDemand.fWeight     := 0.0;
+    stDemand.bValid      := bValid;
 ELSE
-    stDemand.eKind     := E_LoadKind.Estimated;
-    stDemand.fAcPowerW := 0.0;
-    stDemand.fWeight   := UDINT_TO_LREAL(stCfg.nPixelCount);
-    stDemand.bValid    := TRUE;
+    stDemand.eKind       := E_LoadKind.Estimated;
+    stDemand.fAcPowerW   := 0.0;
+    stDemand.fCableLossW := fCableLossW;  // from the share, once SetShare() has run this cycle
+    stDemand.fWeight     := UDINT_TO_LREAL(stCfg.nPixelCount);
+    stDemand.bValid      := TRUE;
 END_IF
 GetDemand := stDemand;]]></ST>
       </Implementation>
@@ -73,8 +87,10 @@ VAR_INPUT
 END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[IF NOT stCfg.bHasEcPowerSupply THEN
-    fAcPowerW := MAX(0.0, fShareW);
-    fDcVolts  := stCfg.fNominalDcVolts;
+    // The share includes the loss in the box's own cable. What arrives at the box is less.
+    fAcPowerW   := F_PowerAfterCable(fShareW := fShareW, fLengthFt := stCfg.fWireLengthFt, nAwg := stCfg.nWireAwg);
+    fCableLossW := MAX(0.0, fShareW) - fAcPowerW;
+    fDcVolts    := stCfg.fNominalDcVolts;
     IF stCfg.fNominalDcVolts > 1.0 THEN
         fDcAmps := fAcPowerW * fEff / stCfg.fNominalDcVolts;
     ELSE
@@ -121,6 +137,7 @@ fbJson.AddBool(bValid);
 F_JsonNum(sKey := 'dcAmps', fValue := fDcAmps, bValid := bValid, nDecimals := 2, fbJson := fbJson);
 F_JsonNum(sKey := 'dcVolts', fValue := fDcVolts, bValid := bValid AND stCfg.bHasEcPowerSupply, nDecimals := 1, fbJson := fbJson);
 F_JsonNum(sKey := 'acW', fValue := fAcPowerW, bValid := bValid, nDecimals := 1, fbJson := fbJson);
+F_JsonNum(sKey := 'cableLossW', fValue := fCableLossW, bValid := bValid, nDecimals := 1, fbJson := fbJson);
 
 fbJson.AddKey('psu');
 IF stCfg.bHasEcPowerSupply THEN

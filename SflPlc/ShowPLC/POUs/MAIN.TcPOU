@@ -6,7 +6,7 @@ VAR
     // Power model
     aFeeds     : ARRAY[1..GVL_Param.FEED_COUNT] OF FB_PowerFeed;
     aSimMeters : ARRAY[1..GVL_Param.FEED_COUNT] OF FB_PowerMeter_Sim;
-    aBoxes     : ARRAY[1..GVL_Param.BOX_COUNT] OF FB_SateliteController;
+    aBoxes     : ARRAY[1..GVL_Param.BOX_COUNT] OF FB_SatelliteController;
     aLoads     : ARRAY[1..GVL_Param.LOAD_COUNT] OF FB_GenericLoad;
     ipMeter    : I_PowerMeter;
 

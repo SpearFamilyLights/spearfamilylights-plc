@@ -3222,7 +3222,7 @@
 			</ArrayInfo>
 		</DataType>
 		<DataType>
-			<Name GUID="{18071995-0000-0000-0000-00200000000E}" IecBaseType="true" AutoDeleteType="true" HideSubItems="true">ARRAY [0..13] OF BIT</Name>
+			<Name GUID="{18071995-0000-0000-0000-00200000000E}" IecBaseType="true" BitType="true" AutoDeleteType="true" HideSubItems="true">ARRAY [0..13] OF BIT</Name>
 			<BitSize>14</BitSize>
 			<BaseType GUID="{18071995-0000-0000-0000-000000000010}">BIT</BaseType>
 			<ArrayInfo>
@@ -3231,7 +3231,7 @@
 			</ArrayInfo>
 		</DataType>
 		<DataType>
-			<Name GUID="{18071995-0000-0000-0000-002000000005}" IecBaseType="true" AutoDeleteType="true" HideSubItems="true">ARRAY [0..4] OF BIT</Name>
+			<Name GUID="{18071995-0000-0000-0000-002000000005}" IecBaseType="true" BitType="true" AutoDeleteType="true" HideSubItems="true">ARRAY [0..4] OF BIT</Name>
 			<BitSize>5</BitSize>
 			<BaseType GUID="{18071995-0000-0000-0000-000000000010}">BIT</BaseType>
 			<ArrayInfo>
@@ -3240,7 +3240,7 @@
 			</ArrayInfo>
 		</DataType>
 		<DataType>
-			<Name GUID="{18071995-0000-0000-0000-002000000007}" IecBaseType="true" AutoDeleteType="true" HideSubItems="true">ARRAY [0..6] OF BIT</Name>
+			<Name GUID="{18071995-0000-0000-0000-002000000007}" IecBaseType="true" BitType="true" AutoDeleteType="true" HideSubItems="true">ARRAY [0..6] OF BIT</Name>
 			<BitSize>7</BitSize>
 			<BaseType GUID="{18071995-0000-0000-0000-000000000010}">BIT</BaseType>
 			<ArrayInfo>
@@ -3249,7 +3249,7 @@
 			</ArrayInfo>
 		</DataType>
 		<DataType>
-			<Name GUID="{18071995-0000-0000-0000-00200000000B}" IecBaseType="true" AutoDeleteType="true" HideSubItems="true">ARRAY [0..10] OF BIT</Name>
+			<Name GUID="{18071995-0000-0000-0000-00200000000B}" IecBaseType="true" BitType="true" AutoDeleteType="true" HideSubItems="true">ARRAY [0..10] OF BIT</Name>
 			<BitSize>11</BitSize>
 			<BaseType GUID="{18071995-0000-0000-0000-000000000010}">BIT</BaseType>
 			<ArrayInfo>
@@ -3258,7 +3258,7 @@
 			</ArrayInfo>
 		</DataType>
 		<DataType>
-			<Name GUID="{18071995-0000-0000-0000-002000000004}" IecBaseType="true" AutoDeleteType="true" HideSubItems="true">ARRAY [0..3] OF BIT</Name>
+			<Name GUID="{18071995-0000-0000-0000-002000000004}" IecBaseType="true" BitType="true" AutoDeleteType="true" HideSubItems="true">ARRAY [0..3] OF BIT</Name>
 			<BitSize>4</BitSize>
 			<BaseType GUID="{18071995-0000-0000-0000-000000000010}">BIT</BaseType>
 			<ArrayInfo>
@@ -3267,7 +3267,7 @@
 			</ArrayInfo>
 		</DataType>
 		<DataType>
-			<Name GUID="{18071995-0000-0000-0000-002000000016}" IecBaseType="true" AutoDeleteType="true" HideSubItems="true">ARRAY [0..21] OF BIT</Name>
+			<Name GUID="{18071995-0000-0000-0000-002000000016}" IecBaseType="true" BitType="true" AutoDeleteType="true" HideSubItems="true">ARRAY [0..21] OF BIT</Name>
 			<BitSize>22</BitSize>
 			<BaseType GUID="{18071995-0000-0000-0000-000000000010}">BIT</BaseType>
 			<ArrayInfo>
@@ -3276,7 +3276,7 @@
 			</ArrayInfo>
 		</DataType>
 		<DataType>
-			<Name GUID="{18071995-0000-0000-0000-00200000001B}" IecBaseType="true" AutoDeleteType="true" HideSubItems="true">ARRAY [0..26] OF BIT</Name>
+			<Name GUID="{18071995-0000-0000-0000-00200000001B}" IecBaseType="true" BitType="true" AutoDeleteType="true" HideSubItems="true">ARRAY [0..26] OF BIT</Name>
 			<BitSize>27</BitSize>
 			<BaseType GUID="{18071995-0000-0000-0000-000000000010}">BIT</BaseType>
 			<ArrayInfo>
@@ -3285,7 +3285,7 @@
 			</ArrayInfo>
 		</DataType>
 		<DataType>
-			<Name GUID="{18071995-0000-0000-0000-00200000001E}" IecBaseType="true" AutoDeleteType="true" HideSubItems="true">ARRAY [0..29] OF BIT</Name>
+			<Name GUID="{18071995-0000-0000-0000-00200000001E}" IecBaseType="true" BitType="true" AutoDeleteType="true" HideSubItems="true">ARRAY [0..29] OF BIT</Name>
 			<BitSize>30</BitSize>
 			<BaseType GUID="{18071995-0000-0000-0000-000000000010}">BIT</BaseType>
 			<ArrayInfo>
@@ -3294,7 +3294,7 @@
 			</ArrayInfo>
 		</DataType>
 		<DataType>
-			<Name GUID="{18071995-0000-0000-0000-00200000001F}" IecBaseType="true" AutoDeleteType="true" HideSubItems="true">ARRAY [0..30] OF BIT</Name>
+			<Name GUID="{18071995-0000-0000-0000-00200000001F}" IecBaseType="true" BitType="true" AutoDeleteType="true" HideSubItems="true">ARRAY [0..30] OF BIT</Name>
 			<BitSize>31</BitSize>
 			<BaseType GUID="{18071995-0000-0000-0000-000000000010}">BIT</BaseType>
 			<ArrayInfo>
@@ -3312,7 +3312,7 @@
 			</ArrayInfo>
 		</DataType>
 		<DataType>
-			<Name GUID="{18071995-0000-0000-0000-002000000001}" IecBaseType="true" AutoDeleteType="true" HideSubItems="true">ARRAY [0..0] OF BIT</Name>
+			<Name GUID="{18071995-0000-0000-0000-002000000001}" IecBaseType="true" BitType="true" AutoDeleteType="true" HideSubItems="true">ARRAY [0..0] OF BIT</Name>
 			<BitSize>1</BitSize>
 			<BaseType GUID="{18071995-0000-0000-0000-000000000010}">BIT</BaseType>
 			<ArrayInfo>
@@ -3321,7 +3321,7 @@
 			</ArrayInfo>
 		</DataType>
 		<DataType>
-			<Name GUID="{18071995-0000-0000-0000-00200000003C}" IecBaseType="true" AutoDeleteType="true" HideSubItems="true">ARRAY [0..59] OF BIT</Name>
+			<Name GUID="{18071995-0000-0000-0000-00200000003C}" IecBaseType="true" BitType="true" AutoDeleteType="true" HideSubItems="true">ARRAY [0..59] OF BIT</Name>
 			<BitSize>60</BitSize>
 			<BaseType GUID="{18071995-0000-0000-0000-000000000010}">BIT</BaseType>
 			<ArrayInfo>
@@ -3330,7 +3330,7 @@
 			</ArrayInfo>
 		</DataType>
 		<DataType>
-			<Name GUID="{18071995-0000-0000-0000-00200000000F}" IecBaseType="true" AutoDeleteType="true" HideSubItems="true">ARRAY [0..14] OF BIT</Name>
+			<Name GUID="{18071995-0000-0000-0000-00200000000F}" IecBaseType="true" BitType="true" AutoDeleteType="true" HideSubItems="true">ARRAY [0..14] OF BIT</Name>
 			<BitSize>15</BitSize>
 			<BaseType GUID="{18071995-0000-0000-0000-000000000010}">BIT</BaseType>
 			<ArrayInfo>
@@ -3348,7 +3348,7 @@
 			</ArrayInfo>
 		</DataType>
 		<DataType>
-			<Name GUID="{18071995-0000-0000-0000-002000000006}" IecBaseType="true" AutoDeleteType="true" HideSubItems="true">ARRAY [0..5] OF BIT</Name>
+			<Name GUID="{18071995-0000-0000-0000-002000000006}" IecBaseType="true" BitType="true" AutoDeleteType="true" HideSubItems="true">ARRAY [0..5] OF BIT</Name>
 			<BitSize>6</BitSize>
 			<BaseType GUID="{18071995-0000-0000-0000-000000000010}">BIT</BaseType>
 			<ArrayInfo>
@@ -3366,7 +3366,7 @@
 			</ArrayInfo>
 		</DataType>
 		<DataType>
-			<Name GUID="{18071995-0000-0000-0000-00200000000D}" IecBaseType="true" AutoDeleteType="true" HideSubItems="true">ARRAY [0..12] OF BIT</Name>
+			<Name GUID="{18071995-0000-0000-0000-00200000000D}" IecBaseType="true" BitType="true" AutoDeleteType="true" HideSubItems="true">ARRAY [0..12] OF BIT</Name>
 			<BitSize>13</BitSize>
 			<BaseType GUID="{18071995-0000-0000-0000-000000000010}">BIT</BaseType>
 			<ArrayInfo>
@@ -3398,7 +3398,7 @@
 				</Task>
 			</Tasks>
 			<Modules>
-				<Module Id="#x01010010" KeepUnrestoredLinks="2" ClassFactoryId="Beckhoff Automation GmbH|TcPowerSystems|0.1.5.0">
+				<Module Id="#x01010010" Disabled="true" KeepUnrestoredLinks="2" ClassFactoryId="Beckhoff Automation GmbH|TcPowerSystems|0.1.5.0">
 					<Name>Feed1 (TcPowerMeasureEL3453)</Name>
 					<ImageId>1000</ImageId>
 					<TmcDesc GUID="{16797CCE-BECD-4CB8-8C70-70060F2A453A}" ClassFactoryId="Beckhoff Automation GmbH|TcPowerSystems|0.1.5.0">
@@ -4223,7 +4223,7 @@
 						</InterfacePointerValues>
 					</TmcDesc>
 				</Module>
-				<Module Id="#x01010020" KeepUnrestoredLinks="2" ClassFactoryId="Beckhoff Automation GmbH|TcPowerSystems|0.1.5.0">
+				<Module Id="#x01010020" Disabled="true" KeepUnrestoredLinks="2" ClassFactoryId="Beckhoff Automation GmbH|TcPowerSystems|0.1.5.0">
 					<Name>Feed2 (TcPowerMeasureEL3453)</Name>
 					<ImageId>1000</ImageId>
 					<TmcDesc GUID="{16797CCE-BECD-4CB8-8C70-70060F2A453A}" ClassFactoryId="Beckhoff Automation GmbH|TcPowerSystems|0.1.5.0">
@@ -5052,9 +5052,417 @@
 		</System>
 		<Plc>
 			<Project GUID="{E9145B66-1FCD-4695-AB4D-B665A29B1661}" Name="ShowPLC" PrjFilePath="ShowPLC\ShowPLC.plcproj" TmcFilePath="ShowPLC\ShowPLC.tmc" ReloadTmc="true" AmsPort="851" FileArchiveSettings="#x000e" SymbolicMapping="true">
-				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" TmcHash="{4A7939D0-B35F-6265-9934-7EE11159AAFF}" TmcPath="ShowPLC\ShowPLC.tmc">
+				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" TmcHash="{67E902C3-D9BE-E715-1D77-3FCBA9EEF51C}" TmcPath="ShowPLC\ShowPLC.tmc">
 					<Name>ShowPLC Instance</Name>
 					<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
+					<Vars VarGrpType="1">
+						<Name>PlcTask Inputs</Name>
+						<Var>
+							<Name>MAIN.aBoxes[1].fbSupply.bInWarning</Name>
+							<Comment><![CDATA[ 6000:01 Warning]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.aBoxes[1].fbSupply.bInError</Name>
+							<Comment><![CDATA[ 6000:02 Error]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.aBoxes[1].fbSupply.bInDcOk</Name>
+							<Comment><![CDATA[ 6000:04 DC OK]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.aBoxes[1].fbSupply.fInOutputVoltage</Name>
+							<Comment><![CDATA[ 6000:11 Output voltage, V]]></Comment>
+							<Type>REAL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.aBoxes[1].fbSupply.fInOutputCurrent</Name>
+							<Comment><![CDATA[ 6000:12 Output current, A]]></Comment>
+							<Type>REAL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.aBoxes[1].fbSupply.nInInfoData1</Name>
+							<Comment><![CDATA[ 6000:15 Info data 1. Set 8001:19 = 14 (actual temperature)]]></Comment>
+							<Type>UINT</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.aBoxes[1].fbSupply.nInInfoData2</Name>
+							<Comment><![CDATA[ 6000:16 Info data 2. Set 8001:21 = 10 (actual RMS input voltage)]]></Comment>
+							<Type>UINT</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.aBoxes[1].fbSupply.bInWcState</Name>
+							<Comment><![CDATA[ WcState. FALSE = data valid]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.aBoxes[1].fbSupply.nInState</Name>
+							<Comment><![CDATA[ InfoData > State. 8 = OP]]></Comment>
+							<Type>UINT</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.aBoxes[2].fbSupply.bInWarning</Name>
+							<Comment><![CDATA[ 6000:01 Warning]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.aBoxes[2].fbSupply.bInError</Name>
+							<Comment><![CDATA[ 6000:02 Error]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.aBoxes[2].fbSupply.bInDcOk</Name>
+							<Comment><![CDATA[ 6000:04 DC OK]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.aBoxes[2].fbSupply.fInOutputVoltage</Name>
+							<Comment><![CDATA[ 6000:11 Output voltage, V]]></Comment>
+							<Type>REAL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.aBoxes[2].fbSupply.fInOutputCurrent</Name>
+							<Comment><![CDATA[ 6000:12 Output current, A]]></Comment>
+							<Type>REAL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.aBoxes[2].fbSupply.nInInfoData1</Name>
+							<Comment><![CDATA[ 6000:15 Info data 1. Set 8001:19 = 14 (actual temperature)]]></Comment>
+							<Type>UINT</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.aBoxes[2].fbSupply.nInInfoData2</Name>
+							<Comment><![CDATA[ 6000:16 Info data 2. Set 8001:21 = 10 (actual RMS input voltage)]]></Comment>
+							<Type>UINT</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.aBoxes[2].fbSupply.bInWcState</Name>
+							<Comment><![CDATA[ WcState. FALSE = data valid]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.aBoxes[2].fbSupply.nInState</Name>
+							<Comment><![CDATA[ InfoData > State. 8 = OP]]></Comment>
+							<Type>UINT</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.aBoxes[3].fbSupply.bInWarning</Name>
+							<Comment><![CDATA[ 6000:01 Warning]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.aBoxes[3].fbSupply.bInError</Name>
+							<Comment><![CDATA[ 6000:02 Error]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.aBoxes[3].fbSupply.bInDcOk</Name>
+							<Comment><![CDATA[ 6000:04 DC OK]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.aBoxes[3].fbSupply.fInOutputVoltage</Name>
+							<Comment><![CDATA[ 6000:11 Output voltage, V]]></Comment>
+							<Type>REAL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.aBoxes[3].fbSupply.fInOutputCurrent</Name>
+							<Comment><![CDATA[ 6000:12 Output current, A]]></Comment>
+							<Type>REAL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.aBoxes[3].fbSupply.nInInfoData1</Name>
+							<Comment><![CDATA[ 6000:15 Info data 1. Set 8001:19 = 14 (actual temperature)]]></Comment>
+							<Type>UINT</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.aBoxes[3].fbSupply.nInInfoData2</Name>
+							<Comment><![CDATA[ 6000:16 Info data 2. Set 8001:21 = 10 (actual RMS input voltage)]]></Comment>
+							<Type>UINT</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.aBoxes[3].fbSupply.bInWcState</Name>
+							<Comment><![CDATA[ WcState. FALSE = data valid]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.aBoxes[3].fbSupply.nInState</Name>
+							<Comment><![CDATA[ InfoData > State. 8 = OP]]></Comment>
+							<Type>UINT</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.aBoxes[4].fbSupply.bInWarning</Name>
+							<Comment><![CDATA[ 6000:01 Warning]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.aBoxes[4].fbSupply.bInError</Name>
+							<Comment><![CDATA[ 6000:02 Error]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.aBoxes[4].fbSupply.bInDcOk</Name>
+							<Comment><![CDATA[ 6000:04 DC OK]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.aBoxes[4].fbSupply.fInOutputVoltage</Name>
+							<Comment><![CDATA[ 6000:11 Output voltage, V]]></Comment>
+							<Type>REAL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.aBoxes[4].fbSupply.fInOutputCurrent</Name>
+							<Comment><![CDATA[ 6000:12 Output current, A]]></Comment>
+							<Type>REAL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.aBoxes[4].fbSupply.nInInfoData1</Name>
+							<Comment><![CDATA[ 6000:15 Info data 1. Set 8001:19 = 14 (actual temperature)]]></Comment>
+							<Type>UINT</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.aBoxes[4].fbSupply.nInInfoData2</Name>
+							<Comment><![CDATA[ 6000:16 Info data 2. Set 8001:21 = 10 (actual RMS input voltage)]]></Comment>
+							<Type>UINT</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.aBoxes[4].fbSupply.bInWcState</Name>
+							<Comment><![CDATA[ WcState. FALSE = data valid]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.aBoxes[4].fbSupply.nInState</Name>
+							<Comment><![CDATA[ InfoData > State. 8 = OP]]></Comment>
+							<Type>UINT</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.aBoxes[5].fbSupply.bInWarning</Name>
+							<Comment><![CDATA[ 6000:01 Warning]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.aBoxes[5].fbSupply.bInError</Name>
+							<Comment><![CDATA[ 6000:02 Error]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.aBoxes[5].fbSupply.bInDcOk</Name>
+							<Comment><![CDATA[ 6000:04 DC OK]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.aBoxes[5].fbSupply.fInOutputVoltage</Name>
+							<Comment><![CDATA[ 6000:11 Output voltage, V]]></Comment>
+							<Type>REAL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.aBoxes[5].fbSupply.fInOutputCurrent</Name>
+							<Comment><![CDATA[ 6000:12 Output current, A]]></Comment>
+							<Type>REAL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.aBoxes[5].fbSupply.nInInfoData1</Name>
+							<Comment><![CDATA[ 6000:15 Info data 1. Set 8001:19 = 14 (actual temperature)]]></Comment>
+							<Type>UINT</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.aBoxes[5].fbSupply.nInInfoData2</Name>
+							<Comment><![CDATA[ 6000:16 Info data 2. Set 8001:21 = 10 (actual RMS input voltage)]]></Comment>
+							<Type>UINT</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.aBoxes[5].fbSupply.bInWcState</Name>
+							<Comment><![CDATA[ WcState. FALSE = data valid]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.aBoxes[5].fbSupply.nInState</Name>
+							<Comment><![CDATA[ InfoData > State. 8 = OP]]></Comment>
+							<Type>UINT</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.aBoxes[6].fbSupply.bInWarning</Name>
+							<Comment><![CDATA[ 6000:01 Warning]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.aBoxes[6].fbSupply.bInError</Name>
+							<Comment><![CDATA[ 6000:02 Error]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.aBoxes[6].fbSupply.bInDcOk</Name>
+							<Comment><![CDATA[ 6000:04 DC OK]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.aBoxes[6].fbSupply.fInOutputVoltage</Name>
+							<Comment><![CDATA[ 6000:11 Output voltage, V]]></Comment>
+							<Type>REAL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.aBoxes[6].fbSupply.fInOutputCurrent</Name>
+							<Comment><![CDATA[ 6000:12 Output current, A]]></Comment>
+							<Type>REAL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.aBoxes[6].fbSupply.nInInfoData1</Name>
+							<Comment><![CDATA[ 6000:15 Info data 1. Set 8001:19 = 14 (actual temperature)]]></Comment>
+							<Type>UINT</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.aBoxes[6].fbSupply.nInInfoData2</Name>
+							<Comment><![CDATA[ 6000:16 Info data 2. Set 8001:21 = 10 (actual RMS input voltage)]]></Comment>
+							<Type>UINT</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.aBoxes[6].fbSupply.bInWcState</Name>
+							<Comment><![CDATA[ WcState. FALSE = data valid]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.aBoxes[6].fbSupply.nInState</Name>
+							<Comment><![CDATA[ InfoData > State. 8 = OP]]></Comment>
+							<Type>UINT</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.aBoxes[7].fbSupply.bInWarning</Name>
+							<Comment><![CDATA[ 6000:01 Warning]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.aBoxes[7].fbSupply.bInError</Name>
+							<Comment><![CDATA[ 6000:02 Error]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.aBoxes[7].fbSupply.bInDcOk</Name>
+							<Comment><![CDATA[ 6000:04 DC OK]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.aBoxes[7].fbSupply.fInOutputVoltage</Name>
+							<Comment><![CDATA[ 6000:11 Output voltage, V]]></Comment>
+							<Type>REAL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.aBoxes[7].fbSupply.fInOutputCurrent</Name>
+							<Comment><![CDATA[ 6000:12 Output current, A]]></Comment>
+							<Type>REAL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.aBoxes[7].fbSupply.nInInfoData1</Name>
+							<Comment><![CDATA[ 6000:15 Info data 1. Set 8001:19 = 14 (actual temperature)]]></Comment>
+							<Type>UINT</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.aBoxes[7].fbSupply.nInInfoData2</Name>
+							<Comment><![CDATA[ 6000:16 Info data 2. Set 8001:21 = 10 (actual RMS input voltage)]]></Comment>
+							<Type>UINT</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.aBoxes[7].fbSupply.bInWcState</Name>
+							<Comment><![CDATA[ WcState. FALSE = data valid]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.aBoxes[7].fbSupply.nInState</Name>
+							<Comment><![CDATA[ InfoData > State. 8 = OP]]></Comment>
+							<Type>UINT</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.aBoxes[8].fbSupply.bInWarning</Name>
+							<Comment><![CDATA[ 6000:01 Warning]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.aBoxes[8].fbSupply.bInError</Name>
+							<Comment><![CDATA[ 6000:02 Error]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.aBoxes[8].fbSupply.bInDcOk</Name>
+							<Comment><![CDATA[ 6000:04 DC OK]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.aBoxes[8].fbSupply.fInOutputVoltage</Name>
+							<Comment><![CDATA[ 6000:11 Output voltage, V]]></Comment>
+							<Type>REAL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.aBoxes[8].fbSupply.fInOutputCurrent</Name>
+							<Comment><![CDATA[ 6000:12 Output current, A]]></Comment>
+							<Type>REAL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.aBoxes[8].fbSupply.nInInfoData1</Name>
+							<Comment><![CDATA[ 6000:15 Info data 1. Set 8001:19 = 14 (actual temperature)]]></Comment>
+							<Type>UINT</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.aBoxes[8].fbSupply.nInInfoData2</Name>
+							<Comment><![CDATA[ 6000:16 Info data 2. Set 8001:21 = 10 (actual RMS input voltage)]]></Comment>
+							<Type>UINT</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.aBoxes[8].fbSupply.bInWcState</Name>
+							<Comment><![CDATA[ WcState. FALSE = data valid]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.aBoxes[8].fbSupply.nInState</Name>
+							<Comment><![CDATA[ InfoData > State. 8 = OP]]></Comment>
+							<Type>UINT</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.aBoxes[9].fbSupply.bInWarning</Name>
+							<Comment><![CDATA[ 6000:01 Warning]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.aBoxes[9].fbSupply.bInError</Name>
+							<Comment><![CDATA[ 6000:02 Error]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.aBoxes[9].fbSupply.bInDcOk</Name>
+							<Comment><![CDATA[ 6000:04 DC OK]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.aBoxes[9].fbSupply.fInOutputVoltage</Name>
+							<Comment><![CDATA[ 6000:11 Output voltage, V]]></Comment>
+							<Type>REAL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.aBoxes[9].fbSupply.fInOutputCurrent</Name>
+							<Comment><![CDATA[ 6000:12 Output current, A]]></Comment>
+							<Type>REAL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.aBoxes[9].fbSupply.nInInfoData1</Name>
+							<Comment><![CDATA[ 6000:15 Info data 1. Set 8001:19 = 14 (actual temperature)]]></Comment>
+							<Type>UINT</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.aBoxes[9].fbSupply.nInInfoData2</Name>
+							<Comment><![CDATA[ 6000:16 Info data 2. Set 8001:21 = 10 (actual RMS input voltage)]]></Comment>
+							<Type>UINT</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.aBoxes[9].fbSupply.bInWcState</Name>
+							<Comment><![CDATA[ WcState. FALSE = data valid]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.aBoxes[9].fbSupply.nInState</Name>
+							<Comment><![CDATA[ InfoData > State. 8 = OP]]></Comment>
+							<Type>UINT</Type>
+						</Var>
+					</Vars>
 					<Contexts>
 						<Context>
 							<Id>0</Id>

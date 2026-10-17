@@ -3,10 +3,12 @@
   <DUT Name="ST_LoadDemand" Id="{03142ffa-72f4-4174-a47d-918eec1972a9}">
     <Declaration><![CDATA[TYPE ST_LoadDemand :
 STRUCT
-    eKind     : E_LoadKind;  // how the feed treats this load
-    fAcPowerW : LREAL;       // W on the AC side. Measured and Rated loads only
-    fWeight   : LREAL;       // share weight. Estimated loads only (the pixel count)
-    bValid    : BOOL;        // FALSE: a measured load that is not reporting
+    eKind        : E_LoadKind;  // how the feed treats this load
+    fAcPowerW    : LREAL;       // W the load takes at the branch point, its own cable loss included. Measured and Rated loads only
+    fCableLossW  : LREAL;       // W lost in the load's own cable. Measured and Rated: part of fAcPowerW. Estimated: from its current share
+    fWeight      : LREAL;       // share weight: the pixel count. Estimated loads only
+    fCableFactor : LREAL;       // 1/W: loss in the load's own cable = fCableFactor * (power at the load)^2. Estimated loads only
+    bValid       : BOOL;        // FALSE: a measured load that is not reporting
 END_STRUCT
 END_TYPE]]></Declaration>
   </DUT>

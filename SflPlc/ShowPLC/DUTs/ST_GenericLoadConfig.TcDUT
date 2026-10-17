@@ -3,11 +3,13 @@
   <DUT Name="ST_GenericLoadConfig" Id="{ca28d6d9-4e6e-44fe-aef6-050f6e4e55e4}">
     <Declaration><![CDATA[TYPE ST_GenericLoadConfig :
 STRUCT
-    sId          : STRING(20);  // L1, L2, ...
-    sName        : STRING(40);
-    nFeedId      : INT := 1;    // index into GVL_Config.aFeeds
-    fRatedPowerW : LREAL;       // W on the AC side
-    bEnabled     : BOOL;        // FALSE: counts as 0 W
+    sId           : STRING(20);  // L1, L2, ...
+    sName         : STRING(40);
+    nFeedId       : INT := 1;    // index into GVL_Config.aFeeds
+    fRatedPowerW  : LREAL;       // W at the load
+    bEnabled      : BOOL;        // FALSE: counts as 0 W
+    fWireLengthFt : LREAL := 0.0; // one-way length of the load's cable from where it branches off the feed
+    nWireAwg      : INT := 14;   // AWG of one conductor, copper
 END_STRUCT
 END_TYPE]]></Declaration>
   </DUT>

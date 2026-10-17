@@ -84,7 +84,13 @@
     <Compile Include="POUs\Power\FB_PowerMeter_Sim.TcPOU">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="POUs\Power\FB_SateliteController.TcPOU">
+    <Compile Include="POUs\Power\FB_SatelliteController.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Util\F_CableFactor.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Util\F_CableLossW.TcPOU">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="POUs\Util\F_CleanReal.TcPOU">
@@ -109,6 +115,12 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="POUs\Util\F_LowPass.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Util\F_PowerAfterCable.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Util\F_WireOhms.TcPOU">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
