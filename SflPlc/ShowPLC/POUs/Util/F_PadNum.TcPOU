@@ -8,7 +8,6 @@ VAR_INPUT
 END_VAR
 VAR
     sText : STRING(10);
-	vsText: STRING;
 END_VAR]]></Declaration>
     <Implementation>
       <ST><![CDATA[sText := UDINT_TO_STRING(nValue);
