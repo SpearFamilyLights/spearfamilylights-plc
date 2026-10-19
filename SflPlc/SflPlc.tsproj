@@ -5063,7 +5063,7 @@
 		</System>
 		<Plc>
 			<Project GUID="{E9145B66-1FCD-4695-AB4D-B665A29B1661}" Name="ShowPLC" PrjFilePath="ShowPLC\ShowPLC.plcproj" TmcFilePath="ShowPLC\ShowPLC.tmc" ReloadTmc="true" AmsPort="851" FileArchiveSettings="#x000e" SymbolicMapping="true">
-				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" TmcHash="{231E4465-0665-C8E6-3787-A4827F4BAC9A}" TmcPath="ShowPLC\ShowPLC.tmc">
+				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" TmcHash="{229F34A6-1317-C8A0-8994-15E93C425A98}" TmcPath="ShowPLC\ShowPLC.tmc">
 					<Name>ShowPLC Instance</Name>
 					<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
 					<Vars VarGrpType="1">
@@ -5471,6 +5471,21 @@
 						<Var>
 							<Name>MAIN.aBoxes[9].fbSupply.nInState</Name>
 							<Comment><![CDATA[ InfoData > State. 8 = OP]]></Comment>
+							<Type>UINT</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.fbIpc.nEcDevState</Name>
+							<Comment><![CDATA[ Inputs > DevState. 0 = no fault]]></Comment>
+							<Type>UINT</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.fbIpc.nEcSlaveCount</Name>
+							<Comment><![CDATA[ Inputs > SlaveCount: slaves found]]></Comment>
+							<Type>UINT</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.fbIpc.nEcCfgSlaves</Name>
+							<Comment><![CDATA[ InfoData > CfgSlaveCount: slaves configured]]></Comment>
 							<Type>UINT</Type>
 						</Var>
 					</Vars>
@@ -12616,4 +12631,13 @@
 			</Device>
 		</Io>
 	</Project>
+	<Mappings>
+		<OwnerA Name="TIPC^ShowPLC^ShowPLC Instance">
+			<OwnerB Name="TIID^Device 1 (EtherCAT)">
+				<Link VarA="PlcTask Inputs^MAIN.fbIpc.nEcCfgSlaves" VarB="InfoData^CfgSlaveCount"/>
+				<Link VarA="PlcTask Inputs^MAIN.fbIpc.nEcDevState" VarB="Inputs^DevState"/>
+				<Link VarA="PlcTask Inputs^MAIN.fbIpc.nEcSlaveCount" VarB="Inputs^SlaveCount"/>
+			</OwnerB>
+		</OwnerA>
+	</Mappings>
 </TcSmProject>

@@ -18,6 +18,7 @@ VAR
     // Reporting
     fbClock     : FB_ShowClock;
     fbTelemetry : FB_Telemetry;
+    fbIpc       : FB_IpcDiagnostics;
 
     // Persistent data
     bSavePersistent : BOOL;                    // set TRUE online to store GVL_Persist now
@@ -73,6 +74,9 @@ FOR i := 1 TO GVL_Param.FEED_COUNT DO
     fEnergyTodayWh := fEnergyTodayWh + GVL_Persist.aEnergyWh[i];
 END_FOR
 
+// Controller health
+fbIpc();
+
 // Telemetry: hand over the sources, then let it publish
 FOR i := 1 TO GVL_Param.FEED_COUNT DO
     fbTelemetry.AddSource(eSection := E_JsonSection.Feed, ipSource := aFeeds[i]);
@@ -83,6 +87,7 @@ END_FOR
 FOR i := 1 TO GVL_Param.LOAD_COUNT DO
     fbTelemetry.AddSource(eSection := E_JsonSection.Load, ipSource := aLoads[i]);
 END_FOR
+fbTelemetry.AddSource(eSection := E_JsonSection.Diag, ipSource := fbIpc);
 fbTelemetry(stCfg := GVL_Config.stMqtt, sPassword := GVL_Persist.sMqttPassword, sTimestamp := fbClock.sUtcIso,
             bSimulated := GVL_Config.bSimulateMeters OR GVL_Config.bSimulateSupplies,
             fTotalPowerW := fTotalPowerW, fTotalAmps := fTotalAmps, fEnergyTodayWh := fEnergyTodayWh);

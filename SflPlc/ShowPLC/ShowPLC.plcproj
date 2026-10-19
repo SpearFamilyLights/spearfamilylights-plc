@@ -93,6 +93,9 @@
     <Compile Include="POUs\System\FB_Telemetry.TcPOU">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="POUs\System\FB_IpcDiagnostics.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="POUs\Util\F_CableFactor.TcPOU">
       <SubType>Code</SubType>
     </Compile>
