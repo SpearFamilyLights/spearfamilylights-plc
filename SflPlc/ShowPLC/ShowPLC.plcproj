@@ -87,6 +87,9 @@
     <Compile Include="POUs\Power\FB_SatelliteController.TcPOU">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="POUs\System\FB_HostThermal.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="POUs\System\FB_ShowClock.TcPOU">
       <SubType>Code</SubType>
     </Compile>

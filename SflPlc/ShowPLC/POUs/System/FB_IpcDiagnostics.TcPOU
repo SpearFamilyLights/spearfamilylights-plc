@@ -4,6 +4,7 @@
     <Declaration><![CDATA[FUNCTION_BLOCK FB_IpcDiagnostics IMPLEMENTS I_JsonSource
 VAR_INPUT
     bEnable : BOOL := TRUE;  // FALSE: leave the Device Manager alone
+	sHostThermalPath : STRING(255) := '/sys/class/hwmon/hwmon2/temp2_input';  // Zynq FPD: the A53 cores. hwmon1 = rv3032 RTC (board), hwmon2 temp1 = LPD
 END_VAR
 VAR_OUTPUT
     // PLC task
@@ -42,6 +43,10 @@ VAR
     fbRtCpu  : TC_CpuUsage;
     tonRtCpu : TON;
     nRtStep  : INT;
+
+    // Kernel temperature
+    fbThermal  : FB_HostThermal;
+    bMdpTemp   : BOOL;   // the Device Manager served CPU_Temp in the last round
 
     // Device Manager
     fbRegister : FB_IPCDiag_Register;
@@ -108,6 +113,9 @@ ELSE
     nRtStep := 0;
 END_CASE
 
+// ---- Kernel temperature, every 10 s. The Device Manager on RT Linux has no CPU_Temp (V3) ---
+fbThermal(bEnable := bEnable AND (LEN(sHostThermalPath) > 0), sPath := sHostThermalPath);
+
 // ---- Device Manager: register once, then read one parameter after the other ----------
 CASE nMdpStep OF
     0:  // the Device Manager needs time after boot
@@ -157,12 +165,12 @@ CASE nMdpStep OF
                     END_IF
 
                 2:  // CPU temperature, INT, degrees C
-                    bTempValid := FALSE;
-                    IF NOT fbRead.bError THEN
+                    bMdpTemp := FALSE;
+                    IF fbRead.bError AND (nKey <> 2) THEN   // key 2 (CPU_Temp) has the kernel as fallback; its absence is not a faultN
                         hr := fbRead.GetParameter(pBuffer := ADR(nValI16), nBufferSize := SIZEOF(nValI16));
                         IF SUCCEEDED(hr) THEN
                             fCpuTempC  := INT_TO_LREAL(nValI16);
-                            bTempValid := TRUE;
+                            bMdpTemp := TRUE;
                         END_IF
                     END_IF
 
@@ -246,6 +254,12 @@ CASE nMdpStep OF
 ELSE
     nMdpStep := 0;
 END_CASE
+
+// ---- Temperature: the Device Manager's CPU_Temp when it serves one, else the kernel's thermal zone ----
+IF (NOT bMdpTemp) AND fbThermal.bValid THEN
+    fCpuTempC := fbThermal.fTempC;
+END_IF
+bTempValid := bMdpTemp OR fbThermal.bValid;
 
 // ---- EtherCAT master -------------------------------------------------------------------
 bEcLinked := nEcCfgSlaves > 0;
